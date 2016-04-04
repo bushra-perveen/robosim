@@ -27,7 +27,207 @@ import javax.swing.table.TableColumn;
 
 import pk.com.habsoft.robosim.utils.Util;
 
+class DataModel extends DefaultTableModel {
+
+	private static final long serialVersionUID = 1L;
+	static final PersonTableColumn m_columns[] = { new PersonTableColumn("S #", 20, JLabel.LEFT),
+		new PersonTableColumn("Sense", 50, JLabel.LEFT), new PersonTableColumn("Move", 50, JLabel.LEFT) };
+
+	public static final int COUNT = 0;
+	public static final int SENSE = 1;
+	public static final int MOVE = 2;
+
+	protected SimulationBuilder m_parent;
+	protected Vector<RobotCommands> m_vector;
+
+	public DataModel(SimulationBuilder parent) {
+		m_parent = parent;
+		m_vector = new Vector<RobotCommands>();
+	}
+
+	public boolean delete(int row) {
+		if (row < 0 || row >= m_vector.size()) {
+			return false;
+		}
+		m_vector.remove(row);
+		return true;
+	}
+
+	@Override
+	public int getColumnCount() {
+		return m_columns.length;
+	}
+
+	@Override
+	public String getColumnName(int column) {
+		return m_columns[column].m_title;
+	}
+
+	@Override
+	public int getRowCount() {
+		return m_vector == null ? 0 : m_vector.size();
+	}
+
+	@Override
+	public Object getValueAt(int nRow, int nCol) {
+		if (nRow < 0 || nRow >= getRowCount()) {
+			return "";
+		}
+		RobotCommands row = m_vector.elementAt(nRow);
+		switch (nCol) {
+		case COUNT:
+			return row.getCount();
+		case SENSE:
+			return m_parent.colors[row.getSense()];
+		case MOVE:
+			return m_parent.motions[row.getMove()];
+		}
+		return "";
+	}
+
+	public void insertData(RobotCommands r) {
+		m_vector.addElement(new RobotCommands(r.getCount(), r.getSense(), r.getMove()));
+	}
+
+	@Override
+	public boolean isCellEditable(int row, int column) {
+		return column == SENSE | column == MOVE;
+	}
+
+	@Override
+	public void setValueAt(Object value, int nRow, int nCol) {
+		if (nRow < 0 || nRow >= getRowCount()) {
+			return;
+		}
+		RobotCommands row = m_vector.elementAt(nRow);
+
+		switch (nCol) {
+		case COUNT:
+			row.setCount(Integer.parseInt(value.toString()));
+			break;
+		case SENSE:
+			row.setSense(value.toString());
+			break;
+		case MOVE:
+			row.setMove(value.toString());
+			break;
+		}
+	}
+}
+
+class PersonTableColumn {
+
+	String m_title;
+	int m_width;
+	int m_alignment;
+
+	public PersonTableColumn(String title, int width, int alignment) {
+		m_title = title;
+		m_width = width;
+		m_alignment = alignment;
+	}
+}
+
+class RobotCommands {
+
+	private int count = 0;
+	private int sense;
+	private int move;
+
+	public RobotCommands(int count, int sense, int move) {
+		super();
+		this.count = count;
+		setSense(sense);
+		setMove(move);
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public int getMove() {
+		return move;
+	}
+
+	public int getSense() {
+		return sense;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public void setMove(int move) {
+		this.move = move;
+	}
+
+	public void setMove(String move) {
+		for (int i = 0; i < HistogramFilterView.btnNames.length; i++) {
+			if (HistogramFilterView.btnNames[i].equals(move.trim())) {
+				this.move = i;
+				break;
+			}
+		}
+	}
+
+	public void setSense(int sense) {
+		this.sense = sense;
+	}
+
+	public void setSense(String sense) {
+		for (int i = 0; i < HistogramFilterView.sensorNames.length; i++) {
+			if (HistogramFilterView.sensorNames[i].equals(sense.trim())) {
+				this.sense = i;
+				break;
+			}
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "PersonInfoDTO [count=" + count + ", sense=" + sense + ", move=" + move + "]";
+	}
+
+}
+
 public class SimulationBuilder extends JDialog {
+
+	private class MyComboBoxEditor extends DefaultCellEditor {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public MyComboBoxEditor(String[] items) {
+			super(new JComboBox<Object>(items));
+		}
+	}
+
+	private class MyComboBoxRenderer extends JComboBox<Object> implements TableCellRenderer {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public MyComboBoxRenderer(String[] items) {
+			super(items);
+		}
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			if (isSelected) {
+				setForeground(table.getSelectionForeground());
+				super.setBackground(table.getSelectionBackground());
+			} else {
+				setForeground(table.getForeground());
+				setBackground(table.getBackground());
+			}
+
+			// Select the current value
+			setSelectedItem(value);
+			return this;
+		}
+	}
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,18 +246,19 @@ public class SimulationBuilder extends JDialog {
 
 	JPanel pnlNorth;
 	JComboBox<String> cmbSense, cmbMove;
-
 	JButton btnAdd;
+
 	JButton btnDelete;
+
 	JButton btnDeleteAll;
-
 	JButton btnOk, btnCancel;
-
 	ArrayList<RobotCommands> list = new ArrayList<RobotCommands>();
 	int[][] commands;
 	DataModel dataModel;
 	JTable table;
+
 	int totalColors, totalMotions;
+
 	String[] colors, motions;
 
 	public SimulationBuilder(int[][] commands, int totalColors, int totalMotions) {
@@ -74,6 +275,10 @@ public class SimulationBuilder extends JDialog {
 		System.arraycopy(HistogramFilterView.sensorNames, 0, colors, 0, totalColors);
 		System.arraycopy(HistogramFilterView.btnNames, 0, motions, 0, totalMotions);
 		initGUI();
+	}
+
+	public int[][] getNewCommands() {
+		return this.commands;
 	}
 
 	public void initGUI() {
@@ -114,8 +319,7 @@ public class SimulationBuilder extends JDialog {
 		btnAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dataModel.insertData(new RobotCommands(table.getRowCount() + 1, cmbSense.getSelectedIndex(),
-						cmbMove.getSelectedIndex()));
+				dataModel.insertData(new RobotCommands(table.getRowCount() + 1, cmbSense.getSelectedIndex(), cmbMove.getSelectedIndex()));
 				table.tableChanged(new TableModelEvent(dataModel, table.getRowCount() + 1, table.getRowCount() + 1,
 						TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT));
 			}
@@ -261,209 +465,4 @@ public class SimulationBuilder extends JDialog {
 			cmd.setCount(i + 1);
 		}
 	}
-
-	public int[][] getNewCommands() {
-		return this.commands;
-	}
-
-	private class MyComboBoxRenderer extends JComboBox<Object> implements TableCellRenderer {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public MyComboBoxRenderer(String[] items) {
-			super(items);
-		}
-
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			if (isSelected) {
-				setForeground(table.getSelectionForeground());
-				super.setBackground(table.getSelectionBackground());
-			} else {
-				setForeground(table.getForeground());
-				setBackground(table.getBackground());
-			}
-
-			// Select the current value
-			setSelectedItem(value);
-			return this;
-		}
-	}
-
-	private class MyComboBoxEditor extends DefaultCellEditor {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public MyComboBoxEditor(String[] items) {
-			super(new JComboBox<Object>(items));
-		}
-	}
-}
-
-class DataModel extends DefaultTableModel {
-
-	private static final long serialVersionUID = 1L;
-	static final PersonTableColumn m_columns[] = { new PersonTableColumn("S #", 20, JLabel.LEFT),
-			new PersonTableColumn("Sense", 50, JLabel.LEFT), new PersonTableColumn("Move", 50, JLabel.LEFT) };
-
-	public static final int COUNT = 0;
-	public static final int SENSE = 1;
-	public static final int MOVE = 2;
-
-	protected SimulationBuilder m_parent;
-	protected Vector<RobotCommands> m_vector;
-
-	public DataModel(SimulationBuilder parent) {
-		m_parent = parent;
-		m_vector = new Vector<RobotCommands>();
-	}
-
-	public void insertData(RobotCommands r) {
-		m_vector.addElement(new RobotCommands(r.getCount(), r.getSense(), r.getMove()));
-	}
-
-	@Override
-	public int getRowCount() {
-		return m_vector == null ? 0 : m_vector.size();
-	}
-
-	@Override
-	public int getColumnCount() {
-		return m_columns.length;
-	}
-
-	@Override
-	public String getColumnName(int column) {
-		return m_columns[column].m_title;
-	}
-
-	@Override
-	public boolean isCellEditable(int row, int column) {
-		return column == SENSE | column == MOVE;
-	}
-
-	@Override
-	public Object getValueAt(int nRow, int nCol) {
-		if (nRow < 0 || nRow >= getRowCount()) {
-			return "";
-		}
-		RobotCommands row = m_vector.elementAt(nRow);
-		switch (nCol) {
-		case COUNT:
-			return row.getCount();
-		case SENSE:
-			return m_parent.colors[row.getSense()];
-		case MOVE:
-			return m_parent.motions[row.getMove()];
-		}
-		return "";
-	}
-
-	@Override
-	public void setValueAt(Object value, int nRow, int nCol) {
-		if (nRow < 0 || nRow >= getRowCount()) {
-			return;
-		}
-		RobotCommands row = m_vector.elementAt(nRow);
-
-		switch (nCol) {
-		case COUNT:
-			row.setCount(Integer.parseInt(value.toString()));
-			break;
-		case SENSE:
-			row.setSense(value.toString());
-			break;
-		case MOVE:
-			row.setMove(value.toString());
-			break;
-		}
-	}
-
-	public boolean delete(int row) {
-		if (row < 0 || row >= m_vector.size()) {
-			return false;
-		}
-		m_vector.remove(row);
-		return true;
-	}
-}
-
-class PersonTableColumn {
-
-	String m_title;
-	int m_width;
-	int m_alignment;
-
-	public PersonTableColumn(String title, int width, int alignment) {
-		m_title = title;
-		m_width = width;
-		m_alignment = alignment;
-	}
-}
-
-class RobotCommands {
-
-	private int count = 0;
-	private int sense;
-	private int move;
-
-	public RobotCommands(int count, int sense, int move) {
-		super();
-		this.count = count;
-		setSense(sense);
-		setMove(move);
-	}
-
-	public int getCount() {
-		return count;
-	}
-
-	public void setCount(int count) {
-		this.count = count;
-	}
-
-	public int getSense() {
-		return sense;
-	}
-
-	public void setSense(int sense) {
-		this.sense = sense;
-	}
-
-	public void setSense(String sense) {
-		for (int i = 0; i < HistogramFilterView.sensorNames.length; i++) {
-			if (HistogramFilterView.sensorNames[i].equals(sense.trim())) {
-				this.sense = i;
-				break;
-			}
-		}
-	}
-
-	public int getMove() {
-		return move;
-	}
-
-	public void setMove(int move) {
-		this.move = move;
-	}
-
-	public void setMove(String move) {
-		for (int i = 0; i < HistogramFilterView.btnNames.length; i++) {
-			if (HistogramFilterView.btnNames[i].equals(move.trim())) {
-				this.move = i;
-				break;
-			}
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "PersonInfoDTO [count=" + count + ", sense=" + sense + ", move=" + move + "]";
-	}
-
 }

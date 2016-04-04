@@ -11,8 +11,7 @@ public class TestDPPP {
 		d.search();
 	}
 
-	int[][] grid = { { 1, 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 0, 1, 1 },
-			{ 1, 1, 1, 0, 1, 1 } };
+	int[][] grid = { { 1, 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 0, 1, 1 }, { 1, 1, 1, 0, 1, 1 } };
 
 	int[] goal = { 2, 0 };
 	int[] init = { 4, 3, 0 };
@@ -62,8 +61,7 @@ public class TestDPPP {
 								int o2 = RoboMathUtils.modulus((j + action[i]), 4, false);
 								int x2 = x + forward[o2][0];
 								int y2 = y + forward[o2][1];
-								if (x2 >= 0 && x2 < grid.length && y2 >= 0 && y2 < grid[0].length
-										&& grid[x2][y2] == 0) {
+								if (x2 >= 0 && x2 < grid.length && y2 >= 0 && y2 < grid[0].length && grid[x2][y2] == 0) {
 									int v2 = value[o2][x2][y2] + cost[i];
 									if (v2 < value[j][x][y]) {
 										change = true;

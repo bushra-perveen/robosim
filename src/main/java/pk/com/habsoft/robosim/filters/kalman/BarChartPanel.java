@@ -36,59 +36,19 @@ public class BarChartPanel extends JPanel {
 		add(chartPanel);
 	}
 
-	public void setData(double[] measurement_error, double[] kalman_error) {
-		this.measurement_error = measurement_error;
-		this.kalman_error = kalman_error;
-		updateChart();
-	}
-
-	private void updateChart() {
-		// First Panel
-		CategoryDataset dataset = createPositionDataset();
-		JFreeChart chart = createChart(dataset);
-		chartPanel.setChart(chart);
-	}
-
-	@Override
-	public void setSize(int width, int height) {
-		// setPreferredSize(new java.awt.Dimension(width, height));
-		chartPanel.setPreferredSize(new java.awt.Dimension(width - 10, height - 10));
-	}
-
-	/**
-	 * Creates a sample dataset.
-	 * 
-	 * @return a sample dataset.
-	 */
-	private CategoryDataset createPositionDataset() {
-
-		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-		for (int i = 0; i < measurement_error.length; i++) {
-			dataset.addValue(measurement_error[i], mLabel, String.valueOf(i));
-		}
-
-		for (int i = 0; i < kalman_error.length; i++) {
-			dataset.addValue(kalman_error[i], kLabel, String.valueOf(i));
-		}
-
-		return dataset;
-
-	}
-
 	/**
 	 * Creates a sample chart.
-	 * 
+	 *
 	 * @param dataset
 	 *            the dataset.
-	 * 
+	 *
 	 * @return The chart.
 	 */
 	private JFreeChart createChart(CategoryDataset dataset) {
 
 		// create the chart...
 		JFreeChart chart = ChartFactory.createBarChart("", // chart
-															// title
+				// title
 				xLabel, // domain axis label
 				yLabel, // range axis label
 				dataset, // data
@@ -96,7 +56,7 @@ public class BarChartPanel extends JPanel {
 				true, // include legend
 				true, // tooltips?
 				false // URLs?
-		);
+				);
 
 		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 
@@ -130,5 +90,45 @@ public class BarChartPanel extends JPanel {
 
 		return chart;
 
+	}
+
+	/**
+	 * Creates a sample dataset.
+	 *
+	 * @return a sample dataset.
+	 */
+	private CategoryDataset createPositionDataset() {
+
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+		for (int i = 0; i < measurement_error.length; i++) {
+			dataset.addValue(measurement_error[i], mLabel, String.valueOf(i));
+		}
+
+		for (int i = 0; i < kalman_error.length; i++) {
+			dataset.addValue(kalman_error[i], kLabel, String.valueOf(i));
+		}
+
+		return dataset;
+
+	}
+
+	public void setData(double[] measurement_error, double[] kalman_error) {
+		this.measurement_error = measurement_error;
+		this.kalman_error = kalman_error;
+		updateChart();
+	}
+
+	@Override
+	public void setSize(int width, int height) {
+		// setPreferredSize(new java.awt.Dimension(width, height));
+		chartPanel.setPreferredSize(new java.awt.Dimension(width - 10, height - 10));
+	}
+
+	private void updateChart() {
+		// First Panel
+		CategoryDataset dataset = createPositionDataset();
+		JFreeChart chart = createChart(dataset);
+		chartPanel.setChart(chart);
 	}
 }

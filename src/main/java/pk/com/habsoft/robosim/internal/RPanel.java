@@ -18,7 +18,24 @@ public class RPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	public static Font labelFont = new Font("Comic", Font.BOLD, 16);
 	public static int LABEL_HEIGHT = 30;
+
+	public static void main(String[] args) {
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+		int width = (int) size.getWidth();
+		int height = (int) size.getHeight();
+
+		RPanel pnl = new RPanel(300, 300, "Robot World");
+		frame.add(pnl);
+
+		frame.setSize(width, height);
+		frame.setVisible(true);
+	}
+
 	public JPanel pnlPublic;
+
 	private JPanel pnlPrivate;
 
 	public RPanel(double width, double height, String label) {
@@ -49,8 +66,9 @@ public class RPanel extends JPanel {
 		pnlPublic.add(comp, border);
 	}
 
-	public void setLayout(LayoutManager mgr, boolean ok) {
-		pnlPublic.setLayout(mgr);
+	@Override
+	public void doLayout() {
+		pnlPublic.doLayout();
 	}
 
 	@Override
@@ -58,24 +76,8 @@ public class RPanel extends JPanel {
 		pnlPublic.removeAll();
 	}
 
-	@Override
-	public void doLayout() {
-		pnlPublic.doLayout();
-	}
-
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-		int width = (int) size.getWidth();
-		int height = (int) size.getHeight();
-
-		RPanel pnl = new RPanel(300, 300, "Robot World");
-		frame.add(pnl);
-
-		frame.setSize(width, height);
-		frame.setVisible(true);
+	public void setLayout(LayoutManager mgr, boolean ok) {
+		pnlPublic.setLayout(mgr);
 	}
 
 }

@@ -19,11 +19,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 class LineChartPanel extends JPanel {
 
-	private static final long serialVersionUID = 1L;
-	private String xLabel, yLabel;
-	ChartPanel chartPanel = null;
-	List<ChartData> dataList = new ArrayList<ChartData>();
-
 	private class ChartData {
 		String lable;
 		double[] data;
@@ -33,15 +28,21 @@ class LineChartPanel extends JPanel {
 			this.lable = lable;
 		}
 
-		public String getLable() {
-			return lable;
-		}
-
 		public double[] getData() {
 			return data;
 		}
 
+		public String getLable() {
+			return lable;
+		}
+
 	}
+
+	private static final long serialVersionUID = 1L;
+	private String xLabel, yLabel;
+	ChartPanel chartPanel = null;
+
+	List<ChartData> dataList = new ArrayList<ChartData>();
 
 	public LineChartPanel(String xLabel, String yLabel) {
 		this.xLabel = xLabel;
@@ -51,70 +52,35 @@ class LineChartPanel extends JPanel {
 		add(chartPanel);
 	}
 
-	public void clearData() {
-		dataList.clear();
-	}
-
 	public void addData(String lable, double[] data) {
 		dataList.add(new ChartData(lable, data));
 		updateChart();
 	}
 
-	private void updateChart() {
-		// First Panel
-		XYDataset dataset = createPositionDataset();
-		JFreeChart chart = createChart(dataset);
-		chartPanel.setChart(chart);
-	}
-
-	@Override
-	public void setSize(int width, int height) {
-		// setPreferredSize(new java.awt.Dimension(width, height));
-		chartPanel.setPreferredSize(new java.awt.Dimension(width - 10, height - 10));
-	}
-
-	/**
-	 * Creates a sample dataset.
-	 * 
-	 * @return a sample dataset.
-	 */
-	private XYDataset createPositionDataset() {
-
-		final XYSeriesCollection dataset = new XYSeriesCollection();
-
-		for (int k = 0; k < dataList.size(); k++) {
-			ChartData data = dataList.get(k);
-			final XYSeries series1 = new XYSeries(data.getLable());
-			for (int i = 0; i < data.getData().length; i++) {
-				series1.add(i, data.getData()[i]);
-			}
-			dataset.addSeries(series1);
-		}
-
-		return dataset;
-
+	public void clearData() {
+		dataList.clear();
 	}
 
 	/**
 	 * Creates a chart.
-	 * 
+	 *
 	 * @param dataset
 	 *            the data for the chart.
-	 * 
+	 *
 	 * @return a chart.
 	 */
 	private JFreeChart createChart(final XYDataset dataset) {
 
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createXYLineChart("", // chart
-																	// title
+				// title
 				xLabel, // x axis label
 				yLabel, // y axis label
 				dataset, // data
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
 				false // urls
-		);
+				);
 
 		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 		chart.setBackgroundPaint(Color.white);
@@ -141,6 +107,41 @@ class LineChartPanel extends JPanel {
 
 		return chart;
 
+	}
+
+	/**
+	 * Creates a sample dataset.
+	 *
+	 * @return a sample dataset.
+	 */
+	private XYDataset createPositionDataset() {
+
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+
+		for (int k = 0; k < dataList.size(); k++) {
+			ChartData data = dataList.get(k);
+			final XYSeries series1 = new XYSeries(data.getLable());
+			for (int i = 0; i < data.getData().length; i++) {
+				series1.add(i, data.getData()[i]);
+			}
+			dataset.addSeries(series1);
+		}
+
+		return dataset;
+
+	}
+
+	@Override
+	public void setSize(int width, int height) {
+		// setPreferredSize(new java.awt.Dimension(width, height));
+		chartPanel.setPreferredSize(new java.awt.Dimension(width - 10, height - 10));
+	}
+
+	private void updateChart() {
+		// First Panel
+		XYDataset dataset = createPositionDataset();
+		JFreeChart chart = createChart(dataset);
+		chartPanel.setChart(chart);
 	}
 
 }

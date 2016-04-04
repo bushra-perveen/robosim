@@ -12,36 +12,57 @@ public class PIDSimulator {
 	private double speed = 1;
 	private int iter = 100;
 
-	public double getTauP() {
-		return tauP;
+	public double[][] getData(Controller c, boolean drift) {
+
+		IRobot robot = getRobot(drift);
+		double[][] data = new double[getIter()][2];
+		for (int i = 0; i < getIter(); i++) {
+			double steering = c.getCommand(robot.getY());
+			robot.move(steering, getSpeed());
+			data[i][0] = robot.getX();
+			data[i][1] = robot.getY();
+		}
+		return data;
 	}
 
-	public void setTauP(double tauP) {
-		this.tauP = tauP;
+	public double[][] getDData(boolean drift) {
+		Controller c = new PIDController(0, 0, getTauD());
+		return getData(c, drift);
+
 	}
 
-	public double getTauD() {
-		return tauD;
+	public double[][] getIData(boolean drift) {
+		Controller c = new PIDController(0, getTauI(), 0);
+		return getData(c, drift);
+
 	}
 
-	public void setTauD(double tauD) {
-		this.tauD = tauD;
+	public int getIter() {
+		return iter;
 	}
 
-	public double getTauI() {
-		return tauI;
+	public double[][] getPData(boolean drift) {
+		Controller c = new PIDController(getTauP(), 0, 0);
+		return getData(c, drift);
+
 	}
 
-	public void setTauI(double tauI) {
-		this.tauI = tauI;
+	public double[][] getPDData(boolean drift) {
+		Controller c = new PIDController(getTauP(), 0, getTauD());
+		return getData(c, drift);
+
 	}
 
-	public void setSteerDrift(int steerDrift) {
-		this.steerDrift = steerDrift;
+	public double[][] getPIData(boolean drift) {
+		Controller c = new PIDController(getTauP(), getTauI(), 0);
+		return getData(c, drift);
+
 	}
 
-	public int getSteerDrift() {
-		return steerDrift;
+	public double[][] getPIDData(boolean drift) {
+		Controller c = new PIDController(getTauP(), getTauI(), getTauD());
+		return getData(c, drift);
+
 	}
 
 	public double[][] getRefData() {
@@ -110,78 +131,58 @@ public class PIDSimulator {
 	// return data;
 	// }
 
-	public double[][] getPData(boolean drift) {
-		Controller c = new PIDController(getTauP(), 0, 0);
-		return getData(c, drift);
-
-	}
-
-	public double[][] getDData(boolean drift) {
-		Controller c = new PIDController(0, 0, getTauD());
-		return getData(c, drift);
-
-	}
-
-	public double[][] getIData(boolean drift) {
-		Controller c = new PIDController(0, getTauI(), 0);
-		return getData(c, drift);
-
-	}
-
-	public double[][] getPDData(boolean drift) {
-		Controller c = new PIDController(getTauP(), 0, getTauD());
-		return getData(c, drift);
-
-	}
-
-	public double[][] getPIData(boolean drift) {
-		Controller c = new PIDController(getTauP(), getTauI(), 0);
-		return getData(c, drift);
-
-	}
-
-	public double[][] getPIDData(boolean drift) {
-		Controller c = new PIDController(getTauP(), getTauI(), getTauD());
-		return getData(c, drift);
-
-	}
-
-	public double[][] getData(Controller c, boolean drift) {
-
-		IRobot robot = getRobot(drift);
-		double[][] data = new double[getIter()][2];
-		for (int i = 0; i < getIter(); i++) {
-			double steering = c.getCommand(robot.getY());
-			robot.move(steering, getSpeed());
-			data[i][0] = robot.getX();
-			data[i][1] = robot.getY();
-		}
-		return data;
-	}
-
 	private IRobot getRobot(boolean drift) {
 		IRobot robot = new BigRobot(20);
 		robot.setLocation(0, 1, 0);
 		robot.setCheckBoundaries(false);
-		if (drift)
-			robot.setSteering_drift(Math.toRadians(steerDrift));		
+		if (drift) {
+			robot.setSteering_drift(Math.toRadians(steerDrift));
+		}
 		return robot;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+
+	public int getSteerDrift() {
+		return steerDrift;
+	}
+
+	public double getTauD() {
+		return tauD;
+	}
+
+	public double getTauI() {
+		return tauI;
+	}
+
+	public double getTauP() {
+		return tauP;
 	}
 
 	public void setIter(int iter) {
 		this.iter = iter;
 	}
 
-	public int getIter() {
-		return iter;
-	}
-
 	public void setSpeed(double speed) {
 		this.speed = speed;
 	}
 
-	public double getSpeed() {
-		return speed;
+	public void setSteerDrift(int steerDrift) {
+		this.steerDrift = steerDrift;
+	}
+
+	public void setTauD(double tauD) {
+		this.tauD = tauD;
+	}
+
+	public void setTauI(double tauI) {
+		this.tauI = tauI;
+	}
+
+	public void setTauP(double tauP) {
+		this.tauP = tauP;
 	}
 
 }

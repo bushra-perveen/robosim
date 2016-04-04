@@ -21,24 +21,32 @@ public class LandMark implements SimulationObject {
 		blink = true;
 	}
 
-	public void unblink() {
-		blink = false;
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	@Override
+	public void onPaint(Graphics2D g) {
+
+		if (blink) {
+			g.setColor(Color.RED);
+		} else {
+			g.setColor(Color.BLACK);
+		}
+		g.fillRect(x, y, World.LANDMARK_SIZE, World.LANDMARK_SIZE);
+
 	}
 
 	public void setText(String text) {
 		this.text = text;
 	}
 
-	public int getX() {
-		return x;
-	}
-
 	public void setX(int x) {
 		this.x = x;
-	}
-
-	public int getY() {
-		return y;
 	}
 
 	public void setY(int y) {
@@ -50,15 +58,8 @@ public class LandMark implements SimulationObject {
 		return "\nLandMark [x=" + x + ", y=" + y + "]";
 	}
 
-	@Override
-	public void onPaint(Graphics2D g) {
-
-		if (blink)
-			g.setColor(Color.RED);
-		else
-			g.setColor(Color.BLACK);
-		g.fillRect(x, y, World.LANDMARK_SIZE, World.LANDMARK_SIZE);
-
+	public void unblink() {
+		blink = false;
 	}
 
 }

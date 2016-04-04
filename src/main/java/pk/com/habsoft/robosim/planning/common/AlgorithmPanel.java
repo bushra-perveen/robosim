@@ -43,9 +43,8 @@ public class AlgorithmPanel extends RPanel implements ActionListener, Properties
 
 	private static final long serialVersionUID = 1L;
 
-	ArrayList<AlgorithmListener> observers = new ArrayList<AlgorithmListener>();
-
 	private static final String ALGORITHM = "ALGORITHM";
+
 	private static final String LEFT_TURN_COST = "LEFT_TURN_COST";
 	private static final String RIGHT_TURN_COST = "RIGHT_TURN_COST";
 	private static final String GO_STRAIGHT_COST = "GO_STRAIGHT_COST";
@@ -56,6 +55,7 @@ public class AlgorithmPanel extends RPanel implements ActionListener, Properties
 	private static final String HEURISTICS = "HEURISTICS";
 	private static final String USE_STOCHASTIC_MOTION = "USE_STOCHASTIC_MOTION";
 	private static final String P_SUCCESS = "P_SUCCESS";
+	ArrayList<AlgorithmListener> observers = new ArrayList<AlgorithmListener>();
 
 	private int algorithm = Algorithm.A_STAR;
 	private int heuristic = Heuristic.MANHATTAN;
@@ -87,6 +87,51 @@ public class AlgorithmPanel extends RPanel implements ActionListener, Properties
 		createControlPanelContents(pnl);
 
 		add(pnl, BorderLayout.NORTH);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object o = e.getSource();
+		if (o.equals(rbDFS)) {
+			algorithm = Algorithm.DFS;
+		} else if (o.equals(rbBFS)) {
+			algorithm = Algorithm.BFS;
+		} else if (o.equals(rbAStar)) {
+			algorithm = Algorithm.A_STAR;
+		} else if (o.equals(cbUseHeuristic)) {
+			cmbHeuristics.setEnabled(cbUseHeuristic.isSelected());
+		} else if (o.equals(cmbHeuristics)) {
+			heuristic = cmbHeuristics.getSelectedIndex();
+			lblHeuristic.setText(Heuristic.HURISTIC_FUNCTIONS[heuristic]);
+
+		} else if (o.equals(rbDP)) {
+			algorithm = Algorithm.DP;
+		} else if (o.equals(btnApplyCostSettings)) {
+			try {
+				leftTurnCost = Integer.parseInt(spLeftTurnCost.getValue().toString());
+				rightTurnCost = Integer.parseInt(spRightTurnCost.getValue().toString());
+				goStraightCost = Integer.parseInt(spGoStraightCost.getValue().toString());
+				successProb = Double.parseDouble(spSuccessProb.getValue().toString());
+			} catch (Exception e2) {
+			}
+		} else if (o.equals(cbStochasticMotion)) {
+			successProb = Double.parseDouble(spSuccessProb.getValue().toString());
+		} else if (o.equals(cbConsiderOrientation)) {
+		}
+		spSuccessProb.setEnabled(cbStochasticMotion.isSelected() && rbDP.isSelected());
+		cbStochasticMotion.setEnabled(rbDP.isSelected());
+		cbConsiderOrientation.setEnabled(rbDP.isSelected());
+		spLeftTurnCost.setEnabled(cbConsiderOrientation.isSelected() && rbDP.isSelected());
+		spRightTurnCost.setEnabled(cbConsiderOrientation.isSelected() && rbDP.isSelected());
+		spGoStraightCost.setEnabled(cbConsiderOrientation.isSelected() && rbDP.isSelected());
+		btnApplyCostSettings.setEnabled(rbDP.isSelected());
+
+		initAlgorithm();
+
+	}
+
+	public void addAlgorithmObserver(AlgorithmListener listener) {
+		observers.add(listener);
 	}
 
 	private void createControlPanelContents(JPanel pnlNorth) {
@@ -201,6 +246,54 @@ public class AlgorithmPanel extends RPanel implements ActionListener, Properties
 
 	}
 
+	public void initAlgorithm() {
+		// Create algorithm to solve world
+
+		try {
+			if (cbStochasticMotion.isSelected()) {
+				successProb = Double.parseDouble(spSuccessProb.getValue().toString());
+			} else {
+				successProb = 1;
+			}
+
+			if (algorithm == Algorithm.DFS) {
+				algo = new DFSAlgorithm(world, cbAllowDiagonalMotion.isSelected());
+			} else if (algorithm == Algorithm.BFS) {
+				algo = new BFSAlgorithm(world, cbAllowDiagonalMotion.isSelected());
+			} else if (algorithm == Algorithm.A_STAR) {
+				if (cbUseHeuristic.isSelected()) {
+					heuristic = cmbHeuristics.getSelectedIndex();
+				} else {
+					heuristic = Heuristic.NONE;
+				}
+				algo = new AStarAlgorithm(world, heuristic, cbAllowDiagonalMotion.isSelected(), successProb);
+			} else if (algorithm == Algorithm.DP) {
+				if (cbConsiderOrientation.isSelected()) {
+					int[] cost = { rightTurnCost, goStraightCost, leftTurnCost };
+					algo = new DynamicPrograming3D(world, cbAllowDiagonalMotion.isSelected(), cost, successProb);
+				} else {
+					algo = new DynamicPrograming2D(world, cbAllowDiagonalMotion.isSelected(), successProb);
+				}
+			}
+
+			for (Iterator<AlgorithmListener> iter = observers.iterator(); iter.hasNext();) {
+				AlgorithmListener type = iter.next();
+				type.algorithmUpdate(algo);
+			}
+		} catch (Exception e) {
+			if (e.getCause() instanceof OutOfMemoryError) {
+
+			} else {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public boolean isShowHeuristicValue() {
+		return cbShowHuristicVal.isSelected();
+	}
+
 	@Override
 	public boolean loadProperties() {
 		if (prop != null) {
@@ -277,6 +370,10 @@ public class AlgorithmPanel extends RPanel implements ActionListener, Properties
 		return true;
 	}
 
+	// public void setWorld(World world) {
+	// this.world = world;
+	// }
+
 	@Override
 	public void saveProperties() {
 		if (prop != null) {
@@ -296,101 +393,6 @@ public class AlgorithmPanel extends RPanel implements ActionListener, Properties
 		} else {
 			System.out.println("Saving Null properties in Drawing Panel");
 		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object o = e.getSource();
-		if (o.equals(rbDFS)) {
-			algorithm = Algorithm.DFS;
-		} else if (o.equals(rbBFS)) {
-			algorithm = Algorithm.BFS;
-		} else if (o.equals(rbAStar)) {
-			algorithm = Algorithm.A_STAR;
-		} else if (o.equals(cbUseHeuristic)) {
-			cmbHeuristics.setEnabled(cbUseHeuristic.isSelected());
-		} else if (o.equals(cmbHeuristics)) {
-			heuristic = cmbHeuristics.getSelectedIndex();
-			lblHeuristic.setText(Heuristic.HURISTIC_FUNCTIONS[heuristic]);
-
-		} else if (o.equals(rbDP)) {
-			algorithm = Algorithm.DP;
-		} else if (o.equals(btnApplyCostSettings)) {
-			try {
-				leftTurnCost = Integer.parseInt(spLeftTurnCost.getValue().toString());
-				rightTurnCost = Integer.parseInt(spRightTurnCost.getValue().toString());
-				goStraightCost = Integer.parseInt(spGoStraightCost.getValue().toString());
-				successProb = Double.parseDouble(spSuccessProb.getValue().toString());
-			} catch (Exception e2) {
-			}
-		} else if (o.equals(cbStochasticMotion)) {
-			successProb = Double.parseDouble(spSuccessProb.getValue().toString());
-		} else if (o.equals(cbConsiderOrientation)) {
-		}
-		spSuccessProb.setEnabled(cbStochasticMotion.isSelected() && rbDP.isSelected());
-		cbStochasticMotion.setEnabled(rbDP.isSelected());
-		cbConsiderOrientation.setEnabled(rbDP.isSelected());
-		spLeftTurnCost.setEnabled(cbConsiderOrientation.isSelected() && rbDP.isSelected());
-		spRightTurnCost.setEnabled(cbConsiderOrientation.isSelected() && rbDP.isSelected());
-		spGoStraightCost.setEnabled(cbConsiderOrientation.isSelected() && rbDP.isSelected());
-		btnApplyCostSettings.setEnabled(rbDP.isSelected());
-
-		initAlgorithm();
-
-	}
-
-	public void initAlgorithm() {
-		// Create algorithm to solve world
-
-		try {
-			if (cbStochasticMotion.isSelected())
-				successProb = Double.parseDouble(spSuccessProb.getValue().toString());
-			else
-				successProb = 1;
-
-			if (algorithm == Algorithm.DFS) {
-				algo = new DFSAlgorithm(world, cbAllowDiagonalMotion.isSelected());
-			} else if (algorithm == Algorithm.BFS) {
-				algo = new BFSAlgorithm(world, cbAllowDiagonalMotion.isSelected());
-			} else if (algorithm == Algorithm.A_STAR) {
-				if (cbUseHeuristic.isSelected()) {
-					heuristic = cmbHeuristics.getSelectedIndex();
-				} else {
-					heuristic = Heuristic.NONE;
-				}
-				algo = new AStarAlgorithm(world, heuristic, cbAllowDiagonalMotion.isSelected(), successProb);
-			} else if (algorithm == Algorithm.DP) {
-				if (cbConsiderOrientation.isSelected()) {
-					int[] cost = { rightTurnCost, goStraightCost, leftTurnCost };
-					algo = new DynamicPrograming3D(world, cbAllowDiagonalMotion.isSelected(), cost, successProb);
-				} else {
-					algo = new DynamicPrograming2D(world, cbAllowDiagonalMotion.isSelected(), successProb);
-				}
-			}
-
-			for (Iterator<AlgorithmListener> iter = observers.iterator(); iter.hasNext();) {
-				AlgorithmListener type = iter.next();
-				type.algorithmUpdate(algo);
-			}
-		} catch (Exception e) {
-			if (e.getCause() instanceof OutOfMemoryError) {
-
-			} else
-				e.printStackTrace();
-		}
-
-	}
-
-	public boolean isShowHeuristicValue() {
-		return cbShowHuristicVal.isSelected();
-	}
-
-	// public void setWorld(World world) {
-	// this.world = world;
-	// }
-
-	public void addAlgorithmObserver(AlgorithmListener listener) {
-		observers.add(listener);
 	}
 
 	@Override

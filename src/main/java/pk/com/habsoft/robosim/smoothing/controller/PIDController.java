@@ -23,7 +23,7 @@ package pk.com.habsoft.robosim.smoothing.controller;
 
 /**
  * Proportional-Integral-Derivative controller implementation.
- * 
+ *
  * @author Radu Bogdan Rusu
  */
 public class PIDController extends Controller {
@@ -37,7 +37,7 @@ public class PIDController extends Controller {
 
 	/**
 	 * Constructor for PIDController.
-	 * 
+	 *
 	 * @param Kp
 	 *            the proportional constant
 	 * @param Ki
@@ -53,11 +53,12 @@ public class PIDController extends Controller {
 
 	/**
 	 * Calculate and return the controller's command for the controlled system.
-	 * 
+	 *
 	 * @param currentOutput
 	 *            the current output of the system
 	 * @return the new calculated command for the system
 	 */
+	@Override
 	public double getCommand(double currentOutput) {
 		this.currE = this.goal - currentOutput;
 		eSum += currE;
@@ -74,27 +75,17 @@ public class PIDController extends Controller {
 	}
 
 	/**
-	 * Get the current value of the proportional constant.
-	 * 
-	 * @return Kp as a double
+	 * Get the current value of the derivative constant.
+	 *
+	 * @return Kd as a double
 	 */
-	public double getKp() {
-		return this.kp;
-	}
-
-	/**
-	 * Set a new value for the proportional constant.
-	 * 
-	 * @param newKp
-	 *            the new value for Kp
-	 */
-	public void setKp(double newKp) {
-		this.kp = newKp;
+	public double getKd() {
+		return this.kd;
 	}
 
 	/**
 	 * Get the current value of the integral constant.
-	 * 
+	 *
 	 * @return Ki as a double
 	 */
 	public double getKi() {
@@ -102,8 +93,27 @@ public class PIDController extends Controller {
 	}
 
 	/**
+	 * Get the current value of the proportional constant.
+	 *
+	 * @return Kp as a double
+	 */
+	public double getKp() {
+		return this.kp;
+	}
+
+	/**
+	 * Set a new value for the derivative constant.
+	 *
+	 * @param newKd
+	 *            the new value for Kd
+	 */
+	public void setKd(double newKd) {
+		this.kd = newKd;
+	}
+
+	/**
 	 * Set a new value for the integral constant.
-	 * 
+	 *
 	 * @param newKi
 	 *            the new value for Ki
 	 */
@@ -112,21 +122,12 @@ public class PIDController extends Controller {
 	}
 
 	/**
-	 * Get the current value of the derivative constant.
-	 * 
-	 * @return Kd as a double
+	 * Set a new value for the proportional constant.
+	 *
+	 * @param newKp
+	 *            the new value for Kp
 	 */
-	public double getKd() {
-		return this.kd;
-	}
-
-	/**
-	 * Set a new value for the derivative constant.
-	 * 
-	 * @param newKd
-	 *            the new value for Kd
-	 */
-	public void setKd(double newKd) {
-		this.kd = newKd;
+	public void setKp(double newKp) {
+		this.kp = newKp;
 	}
 }

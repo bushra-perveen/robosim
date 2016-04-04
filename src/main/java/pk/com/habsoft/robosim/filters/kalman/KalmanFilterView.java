@@ -35,13 +35,31 @@ public class KalmanFilterView extends RootView {
 	final static int MIN_CAR_SPEED = 0;
 	final static int MAX_CAR_SPEED = 2;
 
+	public static void main(String[] args) {
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		JDesktopPane desk = new JDesktopPane();
+		frame.setContentPane(desk);
+
+		KalmanFilterView view1 = new KalmanFilterView();
+		view1.initGUI();
+
+		desk.add(view1);
+		view1.setVisible(true);
+
+		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frame.setVisible(true);
+	}
+
 	LineChartPanel pnlPosition = null;
+
 	LineChartPanel pnlVelocity = null;
-
 	BarChartPanel pnlPositionError = null;
-	BarChartPanel pnlVelocityError = null;
 
+	BarChartPanel pnlVelocityError = null;
 	RPanel pnlControls = null;
+
 	JButton btnUpdate;
 
 	JSpinner spnTotalTime = new JSpinner();
@@ -86,14 +104,11 @@ public class KalmanFilterView extends RootView {
 		pnlControls = new RPanel(pnlWidth * 2, screenSize.height - (pnlHeight * 2), "Control Panel");
 		pnlControls.setLayout(new FlowLayout(), true);
 
-		pnlControls.add(UIUtils.createSpinnerPanel("Total Time", spnTotalTime, DEFAULT_TOTAL_TIME, MIN_TOTAL_TIME,
-				MAX_TOTAL_TIME, 1));
+		pnlControls.add(UIUtils.createSpinnerPanel("Total Time", spnTotalTime, DEFAULT_TOTAL_TIME, MIN_TOTAL_TIME, MAX_TOTAL_TIME, 1));
 
-		pnlControls.add(UIUtils.createSpinnerPanel("Measurement Variance", spnVariance, DEFAULT_VARIANCE, MIN_VARIANCE,
-				MAX_VARIANCE, 0.1));
+		pnlControls.add(UIUtils.createSpinnerPanel("Measurement Variance", spnVariance, DEFAULT_VARIANCE, MIN_VARIANCE, MAX_VARIANCE, 0.1));
 
-		pnlControls.add(UIUtils.createSpinnerPanel("Car Speed", spnCarSpeed, DEFAULT_CAR_SPEED, MIN_CAR_SPEED,
-				MAX_CAR_SPEED, 0.1));
+		pnlControls.add(UIUtils.createSpinnerPanel("Car Speed", spnCarSpeed, DEFAULT_CAR_SPEED, MIN_CAR_SPEED, MAX_CAR_SPEED, 0.1));
 
 		pnlControls.add(btnUpdate = new JButton("Update"));
 		// pnlControls.setBounds(0, pnlHeight * 2, pnlWidth * 2, (int)
@@ -113,6 +128,67 @@ public class KalmanFilterView extends RootView {
 		getContentPane().add(pnlVelocityError);
 		getContentPane().add(pnlControls);
 		update();
+	}
+
+	@Override
+	public boolean loadProperties() {
+		System.out.println("Property File = " + propertyFile);
+
+		if (super.loadProperties()) {
+			// Load Total Time
+			if (prop.containsKey(TOTAL_TIME_TAG)) {
+				try {
+					int totalTime = Integer.parseInt(prop.getProperty(TOTAL_TIME_TAG));
+					if (totalTime > MAX_TOTAL_TIME || totalTime < MIN_TOTAL_TIME) {
+						System.out.println("Invalid value of tag " + TOTAL_TIME_TAG + " .Expedted : " + MIN_TOTAL_TIME + "-"
+								+ MAX_TOTAL_TIME + ". Loading Default");
+					} else {
+						DEFAULT_TOTAL_TIME = totalTime;
+					}
+				} catch (Exception e) {
+					System.out.println("Invalid value of tag " + TOTAL_TIME_TAG);
+				}
+			}
+			// Load Variance
+			if (prop.containsKey(VARIANCE_TAG)) {
+				try {
+					double variance = Double.parseDouble(prop.getProperty(VARIANCE_TAG));
+					if (variance > MAX_VARIANCE || variance < MIN_VARIANCE) {
+						System.out.println("Invalid value of tag " + VARIANCE_TAG + " .Expedted : " + MIN_VARIANCE + "-" + MAX_VARIANCE
+								+ ". Loading Default");
+					} else {
+						DEFAULT_VARIANCE = variance;
+					}
+				} catch (Exception e) {
+					System.out.println("Invalid value of tag " + VARIANCE_TAG);
+				}
+			}
+			// Load Car Speed
+			if (prop.containsKey(CAR_SPEED_TAG)) {
+				try {
+					double carSpeed = Double.parseDouble(prop.getProperty(CAR_SPEED_TAG));
+					if (carSpeed > MAX_CAR_SPEED || carSpeed < MIN_CAR_SPEED) {
+						System.out.println("Invalid value of tag " + CAR_SPEED_TAG + " .Expedted : " + MIN_CAR_SPEED + "-" + MAX_CAR_SPEED
+								+ ". Loading Default");
+					} else {
+						DEFAULT_CAR_SPEED = carSpeed;
+					}
+				} catch (Exception e) {
+					System.out.println("Invalid value of tag " + CAR_SPEED_TAG);
+				}
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public void saveProperties() {
+		prop.setProperty(TOTAL_TIME_TAG, String.valueOf(DEFAULT_TOTAL_TIME));
+		prop.setProperty(VARIANCE_TAG, String.valueOf(DEFAULT_VARIANCE));
+		prop.setProperty(CAR_SPEED_TAG, String.valueOf(DEFAULT_CAR_SPEED));
+
+		super.saveProperties();
+
 	}
 
 	private void update() {
@@ -139,84 +215,6 @@ public class KalmanFilterView extends RootView {
 		pnlPositionError.setData(anim.getPositionMeasurementError(), anim.getPositionKalmanError());
 		pnlVelocityError.setData(anim.getVelocityMeasurementError(), anim.getVelocityKalmanError());
 
-	}
-
-	@Override
-	public boolean loadProperties() {
-		System.out.println("Property File = " + propertyFile);
-
-		if (super.loadProperties()) {
-			// Load Total Time
-			if (prop.containsKey(TOTAL_TIME_TAG)) {
-				try {
-					int totalTime = Integer.parseInt(prop.getProperty(TOTAL_TIME_TAG));
-					if (totalTime > MAX_TOTAL_TIME || totalTime < MIN_TOTAL_TIME) {
-						System.out.println("Invalid value of tag " + TOTAL_TIME_TAG + " .Expedted : " + MIN_TOTAL_TIME
-								+ "-" + MAX_TOTAL_TIME + ". Loading Default");
-					} else {
-						DEFAULT_TOTAL_TIME = totalTime;
-					}
-				} catch (Exception e) {
-					System.out.println("Invalid value of tag " + TOTAL_TIME_TAG);
-				}
-			}
-			// Load Variance
-			if (prop.containsKey(VARIANCE_TAG)) {
-				try {
-					double variance = Double.parseDouble(prop.getProperty(VARIANCE_TAG));
-					if (variance > MAX_VARIANCE || variance < MIN_VARIANCE) {
-						System.out.println("Invalid value of tag " + VARIANCE_TAG + " .Expedted : " + MIN_VARIANCE + "-"
-								+ MAX_VARIANCE + ". Loading Default");
-					} else {
-						DEFAULT_VARIANCE = variance;
-					}
-				} catch (Exception e) {
-					System.out.println("Invalid value of tag " + VARIANCE_TAG);
-				}
-			}
-			// Load Car Speed
-			if (prop.containsKey(CAR_SPEED_TAG)) {
-				try {
-					double carSpeed = Double.parseDouble(prop.getProperty(CAR_SPEED_TAG));
-					if (carSpeed > MAX_CAR_SPEED || carSpeed < MIN_CAR_SPEED) {
-						System.out.println("Invalid value of tag " + CAR_SPEED_TAG + " .Expedted : " + MIN_CAR_SPEED
-								+ "-" + MAX_CAR_SPEED + ". Loading Default");
-					} else {
-						DEFAULT_CAR_SPEED = carSpeed;
-					}
-				} catch (Exception e) {
-					System.out.println("Invalid value of tag " + CAR_SPEED_TAG);
-				}
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public void saveProperties() {
-		prop.setProperty(TOTAL_TIME_TAG, String.valueOf(DEFAULT_TOTAL_TIME));
-		prop.setProperty(VARIANCE_TAG, String.valueOf(DEFAULT_VARIANCE));
-		prop.setProperty(CAR_SPEED_TAG, String.valueOf(DEFAULT_CAR_SPEED));
-
-		super.saveProperties();
-
-	}
-
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		JDesktopPane desk = new JDesktopPane();
-		frame.setContentPane(desk);
-
-		KalmanFilterView view1 = new KalmanFilterView();
-		view1.initGUI();
-
-		desk.add(view1);
-		view1.setVisible(true);
-
-		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.setVisible(true);
 	}
 
 }

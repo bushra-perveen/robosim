@@ -25,15 +25,55 @@ public class World {
 	final static String DEF_LANDMARK_FILE = "landmarks.properties";
 	final static int NUM_OF_LANDMARKS = 6;
 	public static int LANDMARK_SIZE = 10;
-	private Random r = new Random();
 	static List<LandMark> landmarks = new LinkedList<LandMark>();
+	private static int maxWidth = 500;
+
+	private static int maxHeight = 500;
+
+	private static int thikness = 10;
+
+	public static int getHeight() {
+		return maxHeight;
+	}
+
+	public static List<LandMark> getLandmark() {
+		return landmarks;
+	}
+
+	public static int getMaxHeight() {
+		return maxHeight;
+	}
+
+	public static int getMaxWidth() {
+		return maxWidth;
+	}
+
+	public static int getWallSize() {
+		return thikness;
+	}
+
+	public static int getWidth() {
+		return maxWidth;
+	}
+
+	private static void loadFromProperties(Properties p) {
+		thikness = Integer.parseInt(p.getProperty(TAG_WALL_THICKNESS, DEF_WORLD_WALL));
+
+	}
+
+	public static void setMaxHeight(int maxHeight) {
+		World.maxHeight = maxHeight;
+	}
+
+	public static void setMaxWidth(int maxWidth) {
+		World.maxWidth = maxWidth;
+	}
+
+	private Random r = new Random();
 
 	Logger logger = RobotLogger.getLogger(this.getClass().getName());
-	// final static World _instance = new World();
 
-	private static int maxWidth = 500;
-	private static int maxHeight = 500;
-	private static int thikness = 10;
+	// final static World _instance = new World();
 
 	public World() {
 
@@ -54,9 +94,8 @@ public class World {
 		}
 	}
 
-	private static void loadFromProperties(Properties p) {
-		thikness = Integer.parseInt(p.getProperty(TAG_WALL_THICKNESS, DEF_WORLD_WALL));
-
+	public List<LandMark> getLandmarks() {
+		return new LinkedList<LandMark>(landmarks);
 	}
 
 	private void loadDefault() {
@@ -83,9 +122,8 @@ public class World {
 					// landmark is within the world boundary
 				} else {
 					// load random landmark
-					logger.error("Value out of range " + x + " : " + y + " expecting :  "
-							+ (maxWidth - thikness * 2 - LANDMARK_SIZE) + " - "
-							+ (maxHeight - thikness * 2 - LANDMARK_SIZE));
+					logger.error("Value out of range " + x + " : " + y + " expecting :  " + (maxWidth - thikness * 2 - LANDMARK_SIZE)
+							+ " - " + (maxHeight - thikness * 2 - LANDMARK_SIZE));
 					x = thikness + r.nextInt(maxWidth - thikness * 2 - LANDMARK_SIZE);
 					y = thikness + r.nextInt(maxHeight - thikness * 2 - LANDMARK_SIZE);
 				}
@@ -105,49 +143,13 @@ public class World {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file)));
 				for (int i = 0; i < landmarks.size(); i++) {
 					LandMark p = landmarks.get(i);
-					bw.write((int) p.getX() + "," + (int) p.getY() + "\n");
+					bw.write(p.getX() + "," + p.getY() + "\n");
 				}
 				bw.flush();
 				bw.close();
 			} catch (IOException e) {
 			}
 		}
-	}
-
-	public static int getWidth() {
-		return maxWidth;
-	}
-
-	public static int getHeight() {
-		return maxHeight;
-	}
-
-	public static int getMaxWidth() {
-		return maxWidth;
-	}
-
-	public static void setMaxWidth(int maxWidth) {
-		World.maxWidth = maxWidth;
-	}
-
-	public static int getMaxHeight() {
-		return maxHeight;
-	}
-
-	public static void setMaxHeight(int maxHeight) {
-		World.maxHeight = maxHeight;
-	}
-
-	public static List<LandMark> getLandmark() {
-		return landmarks;
-	}
-
-	public static int getWallSize() {
-		return thikness;
-	}
-
-	public List<LandMark> getLandmarks() {
-		return new LinkedList<LandMark>(landmarks);
 	}
 
 	// public void setLandmarks(List<LandMark> landmarks) {

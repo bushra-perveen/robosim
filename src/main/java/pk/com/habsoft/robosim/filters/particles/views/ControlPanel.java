@@ -29,75 +29,75 @@ import pk.com.habsoft.robosim.utils.UIUtils;
 public class ControlPanel extends JPanel implements ActionListener, ChangeListener, PropertiesListener {
 	private static final long serialVersionUID = 1L;
 	private static char degree = '\u00B0';
+	final static String TAG_PARTICLES = "PARTICLES";
+	final static String TAG_SENSE_NOISE = "SENSE_NOISE";
+	final static String TAG_STEERING_NOISE = "STEERING_NOISE";
+
+	final static String TAG_FORWARD_NOISE = "FORWARD_NOISE";
+	final static String TAG_ROBOT_SIZE = "ROBOT_SIZE";
+	final static String TAG_GHOST_SIZE = "GHOST_SIZE";
+
+	final static String TAG_PARTICLE_SIZE = "PARTICLE_SIZE";
+	final static String TAG_LANDMARK_SIZE = "LANDMARK_SIZE";
+	final static String TAG_MOTION_ANGLE = "MOTION_ANGLE";
+
+	final static String TAG_MOTIONS_SPEED = "MOTIONS_SPEED";
+	final static String TAG_NEW_PARTICLES_RATIO = "NEW_PARTICLES_RATIO";
+	final static String TAG_UNSAMPLED_PARTICLES_RATIO = "UNSAMPLED_PARTICLES_RATIO";
+
+	final static String TAG_BOUNDED_VISION = "BOUNDED_VISION";
+	final static String TAG_SHOW_GHOST = "SHOW_GHOST";
+	final static String TAG_LASER_RANGE = "LASER_RANGE";
+
+	final static String TAG_LASER_ANGLE = "LASER_ANGLE";
+	final static String TAG_SIMULATION_SPEED = "SIMULATION_SPEED";
 	private ParticleSimulator simulation;
+
 	private Properties prop;
 	private Logger log = RobotLogger.getLogger(ControlPanel.class.getName());
-
-	final static String TAG_PARTICLES = "PARTICLES";
 	int DEF_PARTICLES = 1000;
-	private JSpinner spnParticles = new JSpinner();
 
-	final static String TAG_SENSE_NOISE = "SENSE_NOISE";
+	private JSpinner spnParticles = new JSpinner();
 	double DEF_SENSE_NOISE = 10;
 	private JSpinner spnSenseNoise = new JSpinner();
 
-	final static String TAG_STEERING_NOISE = "STEERING_NOISE";
 	int DEF_STEERING_NOISE = 1;
 	private JSpinner spnSteeringNoise = new JSpinner();
-
-	final static String TAG_FORWARD_NOISE = "FORWARD_NOISE";
 	double DEF_FORWARD_NOISE = 0.05;
-	private JSpinner spnForwardNoise = new JSpinner();
 
-	final static String TAG_ROBOT_SIZE = "ROBOT_SIZE";
+	private JSpinner spnForwardNoise = new JSpinner();
 	int DEF_ROBOT_SIZE = 10;
 	private JSpinner spnRobotSize = new JSpinner();
 
-	final static String TAG_GHOST_SIZE = "GHOST_SIZE";
 	int DEF_GHOST_SIZE = 10;
 	private JSpinner spnGhostSize = new JSpinner();
-
-	final static String TAG_PARTICLE_SIZE = "PARTICLE_SIZE";
 	int DEF_PARTICLE_SIZE = 4;
-	private JSpinner spnParticleSize = new JSpinner();
 
-	final static String TAG_LANDMARK_SIZE = "LANDMARK_SIZE";
+	private JSpinner spnParticleSize = new JSpinner();
 	int DEF_LANDMARK_SIZE = 10;
 	private JSpinner spnLandMarkSize = new JSpinner();
 
-	final static String TAG_MOTION_ANGLE = "MOTION_ANGLE";
 	int DEF_MOTION_ANGLE = 3;
 	private JSpinner spnMotionAngle = new JSpinner();
-
-	final static String TAG_MOTIONS_SPEED = "MOTIONS_SPEED";
 	double DEF_MOTIONS_SPEED = 5;
-	private JSpinner spnMotionSpeed = new JSpinner();
 
-	final static String TAG_NEW_PARTICLES_RATIO = "NEW_PARTICLES_RATIO";
+	private JSpinner spnMotionSpeed = new JSpinner();
 	double DEF_NEW_PARTICLES_RATIO = 0.01;
 	private JSpinner spnNewParticlesRatio = new JSpinner();
 
-	final static String TAG_UNSAMPLED_PARTICLES_RATIO = "UNSAMPLED_PARTICLES_RATIO";
 	double DEF_UNSAMPLED_PARTICLES_RATIO = 0.01;
 	private JSpinner spnUnsampledRatio = new JSpinner();
-
-	final static String TAG_BOUNDED_VISION = "BOUNDED_VISION";
 	boolean DEF_BOUNDED_VISION = false;
-	private JCheckBox chkBoundedVision;
 
-	final static String TAG_SHOW_GHOST = "SHOW_GHOST";
+	private JCheckBox chkBoundedVision;
 	boolean DEF_SHOW_GHOST = true;
 	private JCheckBox chkShowGhost;
 
-	final static String TAG_LASER_RANGE = "LASER_RANGE";
 	int DEF_LASER_RANGE = 200;
 	private JSpinner spnLaserRange = new JSpinner();
-
-	final static String TAG_LASER_ANGLE = "LASER_ANGLE";
 	int DEF_LASER_ANGLE = 60;
-	private JSpinner spnLaserAngle = new JSpinner();
 
-	final static String TAG_SIMULATION_SPEED = "SIMULATION_SPEED";
+	private JSpinner spnLaserAngle = new JSpinner();
 	int DEF_SIMULATION_SPEED = 300;
 
 	private JButton btnApplySetting;
@@ -115,6 +115,64 @@ public class ControlPanel extends JPanel implements ActionListener, ChangeListen
 		this.simulation = s;
 		loadProperties();
 		initGUI(width, height);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		Object o = arg0.getSource();
+		if (o.equals(btnNext)) {
+			simulation.nextStep();
+		} else if (o.equals(rbStart)) {
+			simulation.simulate();
+			btnNext.setEnabled(false);
+			btnApplySetting.setEnabled(false);
+		} else if (o.equals(rbStop)) {
+			simulation.setRunning(false);
+			btnNext.setEnabled(true);
+			btnApplySetting.setEnabled(true);
+		} else if (o.equals(btnApplySetting)) {
+			DEF_PARTICLES = Integer.parseInt(spnParticles.getValue().toString());
+			DEF_SENSE_NOISE = Double.parseDouble(spnSenseNoise.getValue().toString());
+			DEF_STEERING_NOISE = Integer.parseInt(spnSteeringNoise.getValue().toString());
+			DEF_FORWARD_NOISE = Double.parseDouble(spnForwardNoise.getValue().toString());
+			DEF_ROBOT_SIZE = Integer.parseInt(spnRobotSize.getValue().toString());
+			DEF_GHOST_SIZE = Integer.parseInt(spnGhostSize.getValue().toString());
+			DEF_PARTICLE_SIZE = Integer.parseInt(spnParticleSize.getValue().toString());
+			DEF_LANDMARK_SIZE = Integer.parseInt(spnLandMarkSize.getValue().toString());
+			DEF_MOTION_ANGLE = Integer.parseInt(spnMotionAngle.getValue().toString());
+			DEF_MOTIONS_SPEED = Double.parseDouble(spnMotionSpeed.getValue().toString());
+			DEF_NEW_PARTICLES_RATIO = Double.parseDouble(spnNewParticlesRatio.getValue().toString());
+			DEF_UNSAMPLED_PARTICLES_RATIO = Double.parseDouble(spnUnsampledRatio.getValue().toString());
+
+			DEF_LASER_RANGE = Integer.parseInt(spnLaserRange.getValue().toString());
+			DEF_LASER_ANGLE = Integer.parseInt(spnLaserAngle.getValue().toString());
+			DEF_BOUNDED_VISION = chkBoundedVision.isSelected();
+			DEF_SHOW_GHOST = chkShowGhost.isSelected();
+
+			simulation.reset(DEF_PARTICLES, DEF_SENSE_NOISE, Math.toRadians(DEF_STEERING_NOISE), DEF_FORWARD_NOISE, DEF_ROBOT_SIZE,
+					DEF_GHOST_SIZE, DEF_PARTICLE_SIZE, new double[][] { { Math.toRadians(DEF_MOTION_ANGLE), DEF_MOTIONS_SPEED } },
+					DEF_NEW_PARTICLES_RATIO, DEF_UNSAMPLED_PARTICLES_RATIO, DEF_LANDMARK_SIZE);
+			simulation.setLaserRange(DEF_BOUNDED_VISION, DEF_LASER_RANGE, DEF_LASER_ANGLE);
+			simulation.showGhost(DEF_SHOW_GHOST);
+
+		} else if (o.equals(btnApplyMotion)) {
+			DEF_MOTION_ANGLE = Integer.parseInt(spnMotionAngle.getValue().toString());
+			DEF_MOTIONS_SPEED = Double.parseDouble(spnMotionSpeed.getValue().toString());
+			DEF_NEW_PARTICLES_RATIO = Double.parseDouble(spnNewParticlesRatio.getValue().toString());
+			DEF_UNSAMPLED_PARTICLES_RATIO = Double.parseDouble(spnUnsampledRatio.getValue().toString());
+			DEF_LASER_RANGE = Integer.parseInt(spnLaserRange.getValue().toString());
+			DEF_LASER_ANGLE = Integer.parseInt(spnLaserAngle.getValue().toString());
+			DEF_BOUNDED_VISION = chkBoundedVision.isSelected();
+			DEF_SHOW_GHOST = chkShowGhost.isSelected();
+
+			simulation.setMotions(new double[][] { { Math.toRadians(DEF_MOTION_ANGLE), DEF_MOTIONS_SPEED } }, DEF_NEW_PARTICLES_RATIO,
+					DEF_UNSAMPLED_PARTICLES_RATIO);
+			simulation.setLaserRange(DEF_BOUNDED_VISION, DEF_LASER_RANGE, DEF_LASER_ANGLE);
+			simulation.showGhost(DEF_SHOW_GHOST);
+
+		} else if (o.equals(btnKidnapRobot)) {
+			simulation.kidnapRobot();
+		}
 	}
 
 	private void initGUI(int width, int height) {
@@ -215,72 +273,11 @@ public class ControlPanel extends JPanel implements ActionListener, ChangeListen
 		add(pnlWest);
 		add(pnlEast);
 
-		simulation.reset(DEF_PARTICLES, DEF_SENSE_NOISE, Math.toRadians(DEF_STEERING_NOISE), DEF_FORWARD_NOISE, DEF_ROBOT_SIZE, DEF_GHOST_SIZE, DEF_PARTICLE_SIZE,
-				new double[][] { { Math.toRadians(DEF_MOTION_ANGLE), DEF_MOTIONS_SPEED } }, DEF_NEW_PARTICLES_RATIO, DEF_UNSAMPLED_PARTICLES_RATIO, DEF_LANDMARK_SIZE);
+		simulation.reset(DEF_PARTICLES, DEF_SENSE_NOISE, Math.toRadians(DEF_STEERING_NOISE), DEF_FORWARD_NOISE, DEF_ROBOT_SIZE,
+				DEF_GHOST_SIZE, DEF_PARTICLE_SIZE, new double[][] { { Math.toRadians(DEF_MOTION_ANGLE), DEF_MOTIONS_SPEED } },
+				DEF_NEW_PARTICLES_RATIO, DEF_UNSAMPLED_PARTICLES_RATIO, DEF_LANDMARK_SIZE);
 		simulation.setLaserRange(DEF_BOUNDED_VISION, DEF_LASER_RANGE, DEF_LASER_ANGLE);
 		simulation.showGhost(DEF_SHOW_GHOST);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		Object o = arg0.getSource();
-		if (o.equals(btnNext)) {
-			simulation.nextStep();
-		} else if (o.equals(rbStart)) {
-			simulation.simulate();
-			btnNext.setEnabled(false);
-			btnApplySetting.setEnabled(false);
-		} else if (o.equals(rbStop)) {
-			simulation.setRunning(false);
-			btnNext.setEnabled(true);
-			btnApplySetting.setEnabled(true);
-		} else if (o.equals(btnApplySetting)) {
-			DEF_PARTICLES = Integer.parseInt(spnParticles.getValue().toString());
-			DEF_SENSE_NOISE = Double.parseDouble(spnSenseNoise.getValue().toString());
-			DEF_STEERING_NOISE = Integer.parseInt(spnSteeringNoise.getValue().toString());
-			DEF_FORWARD_NOISE = Double.parseDouble(spnForwardNoise.getValue().toString());
-			DEF_ROBOT_SIZE = Integer.parseInt(spnRobotSize.getValue().toString());
-			DEF_GHOST_SIZE = Integer.parseInt(spnGhostSize.getValue().toString());
-			DEF_PARTICLE_SIZE = Integer.parseInt(spnParticleSize.getValue().toString());
-			DEF_LANDMARK_SIZE = Integer.parseInt(spnLandMarkSize.getValue().toString());
-			DEF_MOTION_ANGLE = Integer.parseInt(spnMotionAngle.getValue().toString());
-			DEF_MOTIONS_SPEED = Double.parseDouble(spnMotionSpeed.getValue().toString());
-			DEF_NEW_PARTICLES_RATIO = Double.parseDouble(spnNewParticlesRatio.getValue().toString());
-			DEF_UNSAMPLED_PARTICLES_RATIO = Double.parseDouble(spnUnsampledRatio.getValue().toString());
-
-			DEF_LASER_RANGE = Integer.parseInt(spnLaserRange.getValue().toString());
-			DEF_LASER_ANGLE = Integer.parseInt(spnLaserAngle.getValue().toString());
-			DEF_BOUNDED_VISION = chkBoundedVision.isSelected();
-			DEF_SHOW_GHOST = chkShowGhost.isSelected();
-
-			simulation.reset(DEF_PARTICLES, DEF_SENSE_NOISE, Math.toRadians(DEF_STEERING_NOISE), DEF_FORWARD_NOISE, DEF_ROBOT_SIZE, DEF_GHOST_SIZE, DEF_PARTICLE_SIZE,
-					new double[][] { { Math.toRadians(DEF_MOTION_ANGLE), DEF_MOTIONS_SPEED } }, DEF_NEW_PARTICLES_RATIO, DEF_UNSAMPLED_PARTICLES_RATIO, DEF_LANDMARK_SIZE);
-			simulation.setLaserRange(DEF_BOUNDED_VISION, DEF_LASER_RANGE, DEF_LASER_ANGLE);
-			simulation.showGhost(DEF_SHOW_GHOST);
-
-		} else if (o.equals(btnApplyMotion)) {
-			DEF_MOTION_ANGLE = Integer.parseInt(spnMotionAngle.getValue().toString());
-			DEF_MOTIONS_SPEED = Double.parseDouble(spnMotionSpeed.getValue().toString());
-			DEF_NEW_PARTICLES_RATIO = Double.parseDouble(spnNewParticlesRatio.getValue().toString());
-			DEF_UNSAMPLED_PARTICLES_RATIO = Double.parseDouble(spnUnsampledRatio.getValue().toString());
-			DEF_LASER_RANGE = Integer.parseInt(spnLaserRange.getValue().toString());
-			DEF_LASER_ANGLE = Integer.parseInt(spnLaserAngle.getValue().toString());
-			DEF_BOUNDED_VISION = chkBoundedVision.isSelected();
-			DEF_SHOW_GHOST = chkShowGhost.isSelected();
-
-			simulation.setMotions(new double[][] { { Math.toRadians(DEF_MOTION_ANGLE), DEF_MOTIONS_SPEED } }, DEF_NEW_PARTICLES_RATIO, DEF_UNSAMPLED_PARTICLES_RATIO);
-			simulation.setLaserRange(DEF_BOUNDED_VISION, DEF_LASER_RANGE, DEF_LASER_ANGLE);
-			simulation.showGhost(DEF_SHOW_GHOST);
-
-		} else if (o.equals(btnKidnapRobot)) {
-			simulation.kidnapRobot();
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent arg0) {
-		DEF_SIMULATION_SPEED = slSpeed.getValue();
-		simulation.setTimeDelay(500 - DEF_SIMULATION_SPEED);
 	}
 
 	@Override
@@ -342,7 +339,8 @@ public class ControlPanel extends JPanel implements ActionListener, ChangeListen
 			log.error("Invalid value of tag " + TAG_NEW_PARTICLES_RATIO);
 		}
 		try {
-			DEF_UNSAMPLED_PARTICLES_RATIO = Double.parseDouble(prop.getProperty(TAG_UNSAMPLED_PARTICLES_RATIO, "" + DEF_UNSAMPLED_PARTICLES_RATIO));
+			DEF_UNSAMPLED_PARTICLES_RATIO = Double.parseDouble(prop.getProperty(TAG_UNSAMPLED_PARTICLES_RATIO, ""
+					+ DEF_UNSAMPLED_PARTICLES_RATIO));
 		} catch (NumberFormatException e) {
 			log.error("Invalid value of tag " + TAG_UNSAMPLED_PARTICLES_RATIO);
 		}
@@ -393,6 +391,12 @@ public class ControlPanel extends JPanel implements ActionListener, ChangeListen
 		prop.setProperty(TAG_LASER_RANGE, "" + DEF_LASER_RANGE);
 		prop.setProperty(TAG_LASER_ANGLE, "" + DEF_LASER_ANGLE);
 		prop.setProperty(TAG_BOUNDED_VISION, "" + DEF_BOUNDED_VISION);
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent arg0) {
+		DEF_SIMULATION_SPEED = slSpeed.getValue();
+		simulation.setTimeDelay(500 - DEF_SIMULATION_SPEED);
 	}
 
 }

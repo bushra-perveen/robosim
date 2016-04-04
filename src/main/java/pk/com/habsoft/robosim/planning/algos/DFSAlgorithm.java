@@ -31,15 +31,70 @@ public class DFSAlgorithm extends Algorithm {
 	}
 
 	@Override
+	public int getBlockedSize() {
+		return blocked;
+	}
+
+	@Override
+	public double[][] getExpand() {
+		return expand;
+	}
+
+	@Override
+	public int getExploredSize() {
+		return exploredSize;
+	}
+
+	@Override
+	public double[][] getHeuristic() {
+		return new double[world.getRows()][world.getColumns()];
+	}
+
+	@Override
+	public Path getPath() {
+		return path;
+	}
+
+	@Override
+	public int getPathSize() {
+		return pathSize;
+	}
+
+	@Override
+	public int[][] getPolicy() {
+		return policy;
+	}
+
+	@Override
+	public String getResult() {
+		return result;
+	}
+
+	@Override
+	public int getTotalInstances() {
+		return instances;
+	}
+
+	@Override
+	public int getTotalSize() {
+		return exploredSize + unExploredSize + blocked;
+	}
+
+	@Override
+	public int getUnExploredSize() {
+		return unExploredSize;
+	}
+
+	@Override
 	void solve() {
 		for (int i = 0; i < world.getRows(); i++) {
 			for (int j = 0; j < world.getColumns(); j++) {
 				expand[i][j] = -1;
 				if (world.isHidden(i, j)) {
 					policy[i][j] = HIDDEN;
-				} else if (world.isOpen(i, j))
+				} else if (world.isOpen(i, j)) {
 					policy[i][j] = NOT_EXPLORED;
-				else {
+				} else {
 					policy[i][j] = BLOCK;
 					blocked++;
 				}
@@ -134,60 +189,5 @@ public class DFSAlgorithm extends Algorithm {
 		// }
 		// System.out.println(world.printWorld());
 
-	}
-
-	@Override
-	public int[][] getPolicy() {
-		return policy;
-	}
-
-	@Override
-	public double[][] getExpand() {
-		return expand;
-	}
-
-	@Override
-	public int getExploredSize() {
-		return exploredSize;
-	}
-
-	@Override
-	public int getUnExploredSize() {
-		return unExploredSize;
-	}
-
-	@Override
-	public int getPathSize() {
-		return pathSize;
-	}
-
-	@Override
-	public double[][] getHeuristic() {
-		return new double[world.getRows()][world.getColumns()];
-	}
-
-	@Override
-	public int getBlockedSize() {
-		return blocked;
-	}
-
-	@Override
-	public int getTotalSize() {
-		return exploredSize + unExploredSize + blocked;
-	}
-
-	@Override
-	public String getResult() {
-		return result;
-	}
-
-	@Override
-	public Path getPath() {
-		return path;
-	}
-
-	@Override
-	public int getTotalInstances() {
-		return instances;
 	}
 }

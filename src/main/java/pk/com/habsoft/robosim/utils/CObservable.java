@@ -9,18 +9,20 @@ public class CObservable extends Observable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.Observable#clearChanged()
 	 */
+	@Override
 	public synchronized void clearChanged() {
 		super.clearChanged();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.Observable#setChanged()
 	 */
+	@Override
 	public synchronized void setChanged() {
 		super.setChanged();
 	}

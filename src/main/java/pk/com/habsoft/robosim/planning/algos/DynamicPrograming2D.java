@@ -12,21 +12,21 @@ public class DynamicPrograming2D extends Algorithm {
 	// 0, 1, 1, 0, 0 }, { 0, 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 1, 0 } };
 	static int[][] map = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
 
-	// int[][] policy;
-	// double[][] expand;
-	int[][] actions;
-
-	DiscreteWorld world;
-	int initCost = 1000000;
-	int collisionCost = 100;
-	double sProb = 0.8;
-	double fProb = (1 - sProb) / 2;
-
 	public static void main(String[] args) {
 		DiscreteWorld w = new DiscreteWorld(map);
 		w.setGoalNode(map.length - 1, map[0].length - 1);
 		new DynamicPrograming2D(w, false, 0.8);
 	}
+
+	// int[][] policy;
+	// double[][] expand;
+	int[][] actions;
+	DiscreteWorld world;
+	int initCost = 1000000;
+	int collisionCost = 100;
+	double sProb = 0.8;
+
+	double fProb = (1 - sProb) / 2;
 
 	private boolean allowDiagonalMotion;
 
@@ -49,6 +49,70 @@ public class DynamicPrograming2D extends Algorithm {
 	}
 
 	@Override
+	public int getBlockedSize() {
+		return blocked;
+	}
+
+	private double getCost(int x, int y, int i) {
+		int x2 = x + actions[i][0];
+		int y2 = y + actions[i][1];
+		if (world.isOpen(x2, y2)) {
+			return expand[x2][y2];
+		}
+		return collisionCost;
+	}
+
+	@Override
+	public double[][] getExpand() {
+		return expand;
+	}
+
+	@Override
+	public int getExploredSize() {
+		return exploredSize;
+	}
+
+	@Override
+	public double[][] getHeuristic() {
+		return new double[world.getRows()][world.getColumns()];
+	}
+
+	@Override
+	public Path getPath() {
+		return path;
+	}
+
+	@Override
+	public int getPathSize() {
+		return pathSize;
+	}
+
+	@Override
+	public int[][] getPolicy() {
+		return policy;
+	}
+
+	@Override
+	public String getResult() {
+		return result;
+	}
+
+	@Override
+	public int getTotalInstances() {
+		return instances;
+	}
+
+	@Override
+	public int getTotalSize() {
+		return exploredSize + unExploredSize + blocked;
+	}
+
+	@Override
+	public int getUnExploredSize() {
+		return unExploredSize;
+	}
+
+	@Override
 	void solve() {
 		for (int i = 0; i < world.getRows(); i++) {
 			for (int j = 0; j < world.getColumns(); j++) {
@@ -56,9 +120,9 @@ public class DynamicPrograming2D extends Algorithm {
 				// if (world.isHidden(i, j)) {
 				// policy[i][j] = HIDDEN;
 				// } else
-				if (world.isOpen(i, j))
+				if (world.isOpen(i, j)) {
 					policy[i][j] = NOT_EXPLORED;
-				else {
+				} else {
 					policy[i][j] = BLOCK;
 					blocked++;
 				}
@@ -127,68 +191,5 @@ public class DynamicPrograming2D extends Algorithm {
 		// System.out.println();
 		// }
 
-	}
-
-	private double getCost(int x, int y, int i) {
-		int x2 = x + actions[i][0];
-		int y2 = y + actions[i][1];
-		if (world.isOpen(x2, y2))
-			return expand[x2][y2];
-		return collisionCost;
-	}
-
-	@Override
-	public int[][] getPolicy() {
-		return policy;
-	}
-
-	@Override
-	public double[][] getExpand() {
-		return expand;
-	}
-
-	@Override
-	public int getExploredSize() {
-		return exploredSize;
-	}
-
-	@Override
-	public int getUnExploredSize() {
-		return unExploredSize;
-	}
-
-	@Override
-	public int getPathSize() {
-		return pathSize;
-	}
-
-	@Override
-	public double[][] getHeuristic() {
-		return new double[world.getRows()][world.getColumns()];
-	}
-
-	@Override
-	public int getBlockedSize() {
-		return blocked;
-	}
-
-	@Override
-	public int getTotalSize() {
-		return exploredSize + unExploredSize + blocked;
-	}
-
-	@Override
-	public String getResult() {
-		return result;
-	}
-
-	@Override
-	public Path getPath() {
-		return path;
-	}
-
-	@Override
-	public int getTotalInstances() {
-		return instances;
 	}
 }

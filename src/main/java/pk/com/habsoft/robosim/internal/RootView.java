@@ -21,12 +21,12 @@ import javax.swing.event.InternalFrameEvent;
 abstract public class RootView extends JInternalFrame implements PropertiesListener {
 
 	private static final long serialVersionUID = 1L;
+	// TODO subtract 100 pixels
+	public static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	protected String viewName = "";
 	public int LABEL_HEIGHT = 30;
 	public Border lineBorder;
 	public boolean isInit = false;
-	// TODO subtract 100 pixels
-	public static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 	protected String propertyFile = "";
 	protected Properties prop = new Properties();
@@ -45,6 +45,25 @@ abstract public class RootView extends JInternalFrame implements PropertiesListe
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public abstract void initGUI();
+
+	private void jbInit() throws Exception {
+		this.setFont(new java.awt.Font("Dialog", 0, 10));
+		lineBorder = BorderFactory.createLineBorder(Color.BLACK);
+
+		this.addInternalFrameListener(new InternalFrameAdapter() {
+			@Override
+			public void internalFrameActivated(InternalFrameEvent e) {
+				this_internalFrameActivated(e);
+			}
+
+			@Override
+			public void internalFrameClosing(InternalFrameEvent e) {
+				this_internalFrameClosing(e);
+			}
+		});
 	}
 
 	@Override
@@ -81,51 +100,23 @@ abstract public class RootView extends JInternalFrame implements PropertiesListe
 		System.out.println("** Saving properties file. " + propertyFile);
 	}
 
-	@Override
-	public void setBounds(int x, int y, int width, int height) {
-		super.setBounds(x, y, width, height);
-	}
-
 	public void setBounds(double x, double y, double width, double height) {
 		super.setBounds((int) x, (int) y, (int) width, (int) height);
 	}
 
 	@Override
-	public void setSize(int width, int height) {
-		super.setSize(width, height);
+	public void setBounds(int x, int y, int width, int height) {
+		super.setBounds(x, y, width, height);
 	}
 
 	public void setSize(double width, double height) {
 		super.setSize((int) width, (int) height);
 	}
 
-	private void jbInit() throws Exception {
-		this.setFont(new java.awt.Font("Dialog", 0, 10));
-		lineBorder = BorderFactory.createLineBorder(Color.BLACK);
-
-		this.addInternalFrameListener(new InternalFrameAdapter() {
-			@Override
-			public void internalFrameActivated(InternalFrameEvent e) {
-				this_internalFrameActivated(e);
-			}
-
-			@Override
-			public void internalFrameClosing(InternalFrameEvent e) {
-				this_internalFrameClosing(e);
-			}
-		});
+	@Override
+	public void setSize(int width, int height) {
+		super.setSize(width, height);
 	}
-
-	public void this_internalFrameActivated(InternalFrameEvent e) {
-	}
-
-	public void this_internalFrameClosing(InternalFrameEvent e) {
-		if (isInit) {
-			saveProperties();
-		}
-	}
-
-	public abstract void initGUI();
 
 	public void showView() {
 		setVisible(true);
@@ -134,6 +125,15 @@ abstract public class RootView extends JInternalFrame implements PropertiesListe
 			setIcon(false);
 		} catch (java.beans.PropertyVetoException ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	public void this_internalFrameActivated(InternalFrameEvent e) {
+	}
+
+	public void this_internalFrameClosing(InternalFrameEvent e) {
+		if (isInit) {
+			saveProperties();
 		}
 	}
 

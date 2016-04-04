@@ -33,7 +33,7 @@ public class KalmanFilter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param measurement
 	 */
 	public void filter(double[] measurement) {
@@ -74,8 +74,16 @@ public class KalmanFilter {
 
 	}
 
+	public RealMatrix getP() {
+		return new Array2DRowRealMatrix(p.getData());
+	}
+
+	public RealMatrix getX() {
+		return new Array2DRowRealMatrix(x.getData());
+	}
+
 	/**
-	 * 
+	 *
 	 * @param xx
 	 *            (initial state)
 	 * @param pp
@@ -97,14 +105,6 @@ public class KalmanFilter {
 		h = new Array2DRowRealMatrix(hh);
 		r = new Array2DRowRealMatrix(rr);
 		identity = MatrixUtils.createRealIdentityMatrix(pp[0].length);
-	}
-
-	public RealMatrix getX() {
-		return new Array2DRowRealMatrix(x.getData());
-	}
-
-	public RealMatrix getP() {
-		return new Array2DRowRealMatrix(p.getData());
 	}
 
 }

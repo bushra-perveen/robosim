@@ -55,6 +55,43 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+
+			<!-- Verify checkstyle rules can cause build failure -->	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.15</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<consoleOutput>true</consoleOutput>
+							<includeTestSourceDirectory>true</includeTestSourceDirectory>
+							<configLocation>etc/config/checkstyle-build.xml</configLocation>
+							<failOnViolation>true</failOnViolation>
+							<excludes>**/guide/*,**/org/glassfish/tyrus/core/wsadl/model/**/*,**/LocalizationMessages.java</excludes>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>6.8.1</version>
+						<exclusions>
+							<!-- MCHECKSTYLE-156 -->
+							<exclusion>
+								<groupId>com.sun</groupId>
+								<artifactId>tools</artifactId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+				</dependencies>
+			</plugin>
+
 			<!-- Copying of project resources to the output directory -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>

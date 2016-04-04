@@ -1,13 +1,12 @@
 package pk.com.habsoft.robosim.planning.algos;
 
 public class Heuristic {
-	public final static int NONE = 0, EUCLIDEAN = 1, EUCLIDEAN_MULTIPLY = 2, EUCLIDEAN_SQUARED = 3, MANHATTAN = 4,
-			CHEBYSHEV = 5;
-	public final static String[] HURISTIC_NAMES = { "None", "Euclidean Diatance(+)", "Euclidean Diatance(*)",
-			"Euclidean Diatance Squared", "Manhattan Distance", "Chebyshev Distance" };
+	public final static int NONE = 0, EUCLIDEAN = 1, EUCLIDEAN_MULTIPLY = 2, EUCLIDEAN_SQUARED = 3, MANHATTAN = 4, CHEBYSHEV = 5;
+	public final static String[] HURISTIC_NAMES = { "None", "Euclidean Diatance(+)", "Euclidean Diatance(*)", "Euclidean Diatance Squared",
+		"Manhattan Distance", "Chebyshev Distance" };
 	public final static String[] HURISTIC_FUNCTIONS = { "h(n)=0", "h(n)=sqrt((x - gX)^2 + (y - gY)^2))",
-			"h(n)=sqrt((x - gX)^2 * (y - gY)^2))", "h(n)=(x - gX)^2 + (y - gY)^2)", "h(n)=abs(x - gX) + abs(y - gY))",
-			"h(n)=max(abs(x - gX),abs(y - gY)))" };
+		"h(n)=sqrt((x - gX)^2 * (y - gY)^2))", "h(n)=(x - gX)^2 + (y - gY)^2)", "h(n)=abs(x - gX) + abs(y - gY))",
+	"h(n)=max(abs(x - gX),abs(y - gY)))" };
 	double[][] heuristic;
 	private int goalX, goalY;
 	private int heuristicType;
@@ -32,6 +31,10 @@ public class Heuristic {
 		// }
 	}
 
+	public double getHeuristic(int x, int y) {
+		return heuristic[x][y];
+	}
+
 	/**
 	 * Used to build array of heuristic
 	 */
@@ -51,10 +54,6 @@ public class Heuristic {
 			h = Math.max(Math.abs(x - goalX), Math.abs(y - goalY));
 		}
 		return h;
-	}
-
-	public double getHeuristic(int x, int y) {
-		return heuristic[x][y];
 	}
 
 }

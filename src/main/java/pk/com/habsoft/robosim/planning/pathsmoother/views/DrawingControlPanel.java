@@ -39,12 +39,6 @@ public class DrawingControlPanel extends JPanel implements ActionListener, Chang
 
 	private int drawMod = DrawingPanel.NONE;
 
-	public void setDrawingPanel(DrawingPanel observer) {
-		this.drawingPanel = observer;
-		this.drawingPanel.setDrawingMod(drawMod);
-
-	}
-
 	public DrawingControlPanel(int rows, int columns) {
 		setLayout(new FlowLayout());
 
@@ -130,10 +124,15 @@ public class DrawingControlPanel extends JPanel implements ActionListener, Chang
 		drawingPanel.setDrawingMod(drawMod);
 	}
 
+	public void setDrawingPanel(DrawingPanel observer) {
+		this.drawingPanel = observer;
+		this.drawingPanel.setDrawingMod(drawMod);
+
+	}
+
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
-		drawingPanel.setWorldSize(Integer.parseInt(spnRows.getValue().toString()),
-				Integer.parseInt(spnColumns.getValue().toString()));
+		drawingPanel.setWorldSize(Integer.parseInt(spnRows.getValue().toString()), Integer.parseInt(spnColumns.getValue().toString()));
 	}
 
 }

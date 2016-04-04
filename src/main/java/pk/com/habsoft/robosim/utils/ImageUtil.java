@@ -13,6 +13,15 @@ import javax.imageio.ImageIO;
 
 public class ImageUtil {
 
+	public static Image createImageFromArray(double[] pixels, int oldWidth, int oldHeight, int newWidth, int newHeight, int imgType)
+			throws Exception {
+		BufferedImage image = new BufferedImage(oldWidth, oldHeight, imgType);
+		WritableRaster raster = (WritableRaster) image.getData();
+		raster.setPixels(0, 0, oldWidth, oldHeight, pixels);
+		image.setData(raster);
+		return resize(image, newWidth, newHeight);
+	}
+
 	public static double[] loadImageData(String name) {
 		BufferedImage bi = null;
 		double[] arr = null;
@@ -29,15 +38,6 @@ public class ImageUtil {
 			System.exit(1);
 		}
 		return arr;
-	}
-
-	public static Image createImageFromArray(double[] pixels, int oldWidth, int oldHeight, int newWidth, int newHeight,
-			int imgType) throws Exception {
-		BufferedImage image = new BufferedImage(oldWidth, oldHeight, imgType);
-		WritableRaster raster = (WritableRaster) image.getData();
-		raster.setPixels(0, 0, oldWidth, oldHeight, pixels);
-		image.setData(raster);
-		return resize(image, newWidth, newHeight);
 	}
 
 	public static BufferedImage resize(BufferedImage image, int w, int h) {

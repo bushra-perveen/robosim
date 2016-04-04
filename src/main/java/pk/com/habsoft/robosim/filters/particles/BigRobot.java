@@ -24,22 +24,6 @@ public class BigRobot extends Robot {
 	}
 
 	@Override
-	public double[] sense(boolean addNoise) {
-		double[] z = new double[World.getLandmark().size()];
-		for (int i = 0; i < z.length; i++) {
-			LandMark landmark = World.getLandmark().get(i);
-			double dx = landmark.getX() - this.x;
-			double dy = landmark.getY() - this.y;
-			double bearing = Math.atan2(dy, dx) - this.orientation;
-			if (addNoise)
-				bearing += RoboMathUtils.nextGaussian(0, sense_noise);
-			bearing = RoboMathUtils.modulus(bearing, 2 * Math.PI);
-			z[i] = bearing;
-		}
-		return z;
-	}
-
-	@Override
 	public double measurement_prob(double[] measurements) {
 		// calculate the correct measurement
 		double[] predicted_measurements = sense(false);
@@ -112,6 +96,23 @@ public class BigRobot extends Robot {
 		setY(y);
 
 		// # turn, and add randomness to the turning command
+	}
+
+	@Override
+	public double[] sense(boolean addNoise) {
+		double[] z = new double[World.getLandmark().size()];
+		for (int i = 0; i < z.length; i++) {
+			LandMark landmark = World.getLandmark().get(i);
+			double dx = landmark.getX() - this.x;
+			double dy = landmark.getY() - this.y;
+			double bearing = Math.atan2(dy, dx) - this.orientation;
+			if (addNoise) {
+				bearing += RoboMathUtils.nextGaussian(0, sense_noise);
+			}
+			bearing = RoboMathUtils.modulus(bearing, 2 * Math.PI);
+			z[i] = bearing;
+		}
+		return z;
 	}
 
 }

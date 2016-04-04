@@ -20,35 +20,37 @@ public class PathNode implements Cloneable {
 		this.y = node.getY();
 	}
 
-	public double getX() {
-		return x;
+	@Override
+	public PathNode clone() throws CloneNotSupportedException {
+		return (PathNode) super.clone();
 	}
 
-	public void setX(double x) {
-		this.x = x;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		PathNode that = (PathNode) obj;
+		if (this.getX() == that.getX() && this.getY() == that.getY()) {
+			return true;
+		}
+		return false;
+	}
+
+	public double getX() {
+		return x;
 	}
 
 	public double getY() {
 		return y;
 	}
 
+	public void setX(double x) {
+		this.x = x;
+	}
+
 	public void setY(double y) {
 		this.y = y;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		PathNode that = (PathNode) obj;
-		if (this.getX() == that.getX() && this.getY() == that.getY())
-			return true;
-		return false;
-	}
-
-	@Override
-	public PathNode clone() throws CloneNotSupportedException {
-		return (PathNode) super.clone();
 	}
 
 	@Override

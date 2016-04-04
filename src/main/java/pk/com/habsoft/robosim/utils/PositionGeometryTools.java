@@ -22,20 +22,34 @@
 
 package pk.com.habsoft.robosim.utils;
 
-import java.awt.*;
+import java.awt.Point;
 
 /**
  * Several methods for position geometric calculus.
- * 
+ *
  * @author Marius Borodi & Radu Bogdan Rusu
  */
 
 public class PositionGeometryTools {
 
 	/**
+	 * Calculate the angle between the line determined by the two points and the
+	 * horizontal axis.
+	 *
+	 * @param p1
+	 *            First point
+	 * @param p2
+	 *            Second point
+	 * @return the angle as an integer
+	 */
+	public static float calcAngle(Point p1, Point p2) {
+		return Math.round(Math.toDegrees(Math.atan2((p2.y - p1.y), (p2.x - p1.x))));
+	}
+
+	/**
 	 * Calculate the distance between two X and Y points assuming that their
 	 * counterparts are 0 using Pitagora's theorem.
-	 * 
+	 *
 	 * @param x
 	 *            X's coordonate of the first point (Y=0)
 	 * @param y
@@ -49,7 +63,7 @@ public class PositionGeometryTools {
 
 	/**
 	 * Calculate the distance between two points (p1 and p2).
-	 * 
+	 *
 	 * @param p1
 	 *            first point
 	 * @param p2
@@ -63,43 +77,9 @@ public class PositionGeometryTools {
 	}
 
 	/**
-	 * Calculate the X coordinate of a point situated at distance <i>dist</i>,
-	 * angle <i>angle</i> from a given point <i>initP</i>.
-	 * 
-	 * @param initP
-	 *            reference point
-	 * @param dist
-	 *            distance from the reference point to the desired point
-	 * @param angle
-	 *            angle from the reference point to the desired point
-	 * @return the X coordinate of the point
-	 */
-	public static float calcX(Point initP, float dist, float angle) {
-		double tmp = (dist * Math.cos(Math.toRadians(angle)));
-		return (initP.x + Math.round(tmp));
-	}
-
-	/**
-	 * Calculate the Y coordinate of a point situated at distance <i>dist</i>,
-	 * angle <i>angle</i> from a given point <i>initP</i>.
-	 * 
-	 * @param initP
-	 *            reference point
-	 * @param dist
-	 *            distance from the reference point to the desired point
-	 * @param angle
-	 *            angle from the reference point to the desired point
-	 * @return the Y coordinate of the point
-	 */
-	public static float calcY(Point initP, float dist, float angle) {
-		double tmp = (dist * Math.sin(Math.toRadians(angle)));
-		return (initP.y + Math.round(tmp));
-	}
-
-	/**
 	 * Calculate the coordinates of a point situated at distance <i>dist</i>,
 	 * angle <i>angle</i> from a given point <i>initP</i>.
-	 * 
+	 *
 	 * @param initP
 	 *            reference point
 	 * @param dist
@@ -119,16 +99,36 @@ public class PositionGeometryTools {
 	}
 
 	/**
-	 * Calculate the angle between the line determined by the two points and the
-	 * horizontal axis.
-	 * 
-	 * @param p1
-	 *            First point
-	 * @param p2
-	 *            Second point
-	 * @return the angle as an integer
+	 * Calculate the X coordinate of a point situated at distance <i>dist</i>,
+	 * angle <i>angle</i> from a given point <i>initP</i>.
+	 *
+	 * @param initP
+	 *            reference point
+	 * @param dist
+	 *            distance from the reference point to the desired point
+	 * @param angle
+	 *            angle from the reference point to the desired point
+	 * @return the X coordinate of the point
 	 */
-	public static float calcAngle(Point p1, Point p2) {
-		return Math.round(Math.toDegrees(Math.atan2((p2.y - p1.y), (p2.x - p1.x))));
+	public static float calcX(Point initP, float dist, float angle) {
+		double tmp = (dist * Math.cos(Math.toRadians(angle)));
+		return (initP.x + Math.round(tmp));
+	}
+
+	/**
+	 * Calculate the Y coordinate of a point situated at distance <i>dist</i>,
+	 * angle <i>angle</i> from a given point <i>initP</i>.
+	 *
+	 * @param initP
+	 *            reference point
+	 * @param dist
+	 *            distance from the reference point to the desired point
+	 * @param angle
+	 *            angle from the reference point to the desired point
+	 * @return the Y coordinate of the point
+	 */
+	public static float calcY(Point initP, float dist, float angle) {
+		double tmp = (dist * Math.sin(Math.toRadians(angle)));
+		return (initP.y + Math.round(tmp));
 	}
 }

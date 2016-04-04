@@ -10,8 +10,16 @@ import pk.com.habsoft.robosim.utils.RoboMathUtils;
  */
 public class DynamicPrograming3D extends Algorithm {
 
-	static int[][] map = { { 1, 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 0, 1, 1 },
-			{ 1, 1, 1, 0, 1, 1 } };
+	static int[][] map = { { 1, 1, 1, 0, 0, 0 }, { 1, 1, 1, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0 }, { 1, 1, 1, 0, 1, 1 }, { 1, 1, 1, 0, 1, 1 } };
+
+	public static void main(String[] args) {
+		DiscreteWorld w = new DiscreteWorld(map);
+		w.setStartNode(4, 3);
+		w.setGoalNode(2, 0);
+		int[] cost = { 1, 1, 15 };
+		new DynamicPrograming3D(w, false, cost, 0.8);
+
+	}
 
 	int[][] d;
 	double[][] heuristic;
@@ -23,29 +31,21 @@ public class DynamicPrograming3D extends Algorithm {
 	int[] cost;
 	// actions for with diagonal motion
 	int[] action = { -2, -1, 0, 1, 2 };
+
 	// actions for without diagonal motion
 	int[] action2 = { -1, 0, 1 };
-
 	int initCost = 50000000;
 	int collisionCost = 5000;
 	double sProb = 0.7;
-	double fProb = (1 - sProb) / 2;
 
+	double fProb = (1 - sProb) / 2;
 	// char[] action_names = { 'R', 'R', '#', 'L', 'L' };
 	int g = -100;
+
 	int orient;
-
 	DiscreteWorld world;
+
 	Heuristic h;
-
-	public static void main(String[] args) {
-		DiscreteWorld w = new DiscreteWorld(map);
-		w.setStartNode(4, 3);
-		w.setGoalNode(2, 0);
-		int[] cost = { 1, 1, 15 };
-		new DynamicPrograming3D(w, false, cost, 0.8);
-
-	}
 
 	private boolean allowDiagonalMotion;
 
@@ -82,13 +82,69 @@ public class DynamicPrograming3D extends Algorithm {
 		solve();
 	}
 
+	@Override
+	public int getBlockedSize() {
+		return blocked;
+	}
+
 	private double getCost(int x, int y, int i) {
 		int o2 = RoboMathUtils.modulus(i, d.length, false);
 		int x2 = x + d[o2][0];
 		int y2 = y + d[o2][1];
-		if (world.isOpen(x2, y2))
+		if (world.isOpen(x2, y2)) {
 			return expand3D[o2][x2][y2];
+		}
 		return collisionCost;
+	}
+
+	@Override
+	public double[][] getExpand() {
+		return expand;
+	}
+
+	@Override
+	public int getExploredSize() {
+		return exploredSize;
+	}
+
+	@Override
+	public double[][] getHeuristic() {
+		return h.heuristic;
+	}
+
+	@Override
+	public Path getPath() {
+		return path;
+	}
+
+	@Override
+	public int getPathSize() {
+		return pathSize;
+	}
+
+	@Override
+	public int[][] getPolicy() {
+		return policy;
+	}
+
+	@Override
+	public String getResult() {
+		return result;
+	}
+
+	@Override
+	public int getTotalInstances() {
+		return instances;
+	}
+
+	@Override
+	public int getTotalSize() {
+		return exploredSize + unExploredSize + blocked;
+	}
+
+	@Override
+	public int getUnExploredSize() {
+		return unExploredSize;
 	}
 
 	@Override
@@ -106,9 +162,9 @@ public class DynamicPrograming3D extends Algorithm {
 			for (int k = 0; k < world.getColumns(); k++) {
 				if (world.isHidden(j, k)) {
 					policy[j][k] = HIDDEN;
-				} else if (world.isOpen(j, k))
+				} else if (world.isOpen(j, k)) {
 					policy[j][k] = NOT_EXPLORED;
-				else {
+				} else {
 					policy[j][k] = BLOCK;
 					blocked++;
 				}
@@ -208,60 +264,5 @@ public class DynamicPrograming3D extends Algorithm {
 		// for (char[] arr : temp) {
 		// System.out.println(Arrays.toString(arr));
 		// }
-	}
-
-	@Override
-	public int[][] getPolicy() {
-		return policy;
-	}
-
-	@Override
-	public double[][] getExpand() {
-		return expand;
-	}
-
-	@Override
-	public int getExploredSize() {
-		return exploredSize;
-	}
-
-	@Override
-	public int getUnExploredSize() {
-		return unExploredSize;
-	}
-
-	@Override
-	public int getPathSize() {
-		return pathSize;
-	}
-
-	@Override
-	public double[][] getHeuristic() {
-		return h.heuristic;
-	}
-
-	@Override
-	public int getBlockedSize() {
-		return blocked;
-	}
-
-	@Override
-	public int getTotalSize() {
-		return exploredSize + unExploredSize + blocked;
-	}
-
-	@Override
-	public String getResult() {
-		return result;
-	}
-
-	@Override
-	public Path getPath() {
-		return path;
-	}
-
-	@Override
-	public int getTotalInstances() {
-		return instances;
 	}
 }

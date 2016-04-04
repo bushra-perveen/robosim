@@ -24,7 +24,7 @@ package pk.com.habsoft.robosim.smoothing.controller;
 /**
  * Abstract controller implementation. Used as a starting point for P, PI, PD,
  * PID controllers.
- * 
+ *
  * @author Radu Bogdan Rusu
  */
 public abstract class Controller {
@@ -41,24 +41,24 @@ public abstract class Controller {
 	protected double lastE;
 
 	/**
-	 * Set a new goal for the controller.
-	 * 
-	 * @param newGoal
-	 *            the new goal for the controller
-	 */
-	public void setGoal(double newGoal) {
-		this.goal = newGoal;
-	}
-
-	public abstract double getCommand(double curretnOutput);
-
-	/**
 	 * Get the difference between the current error and the last error.
-	 * 
+	 *
 	 * @return the difference between the current error and the last error
 	 */
 	protected double deltaE() {
 		// System.out.println("Delta : "+(currE - lastE));
 		return (currE - lastE);
+	}
+
+	public abstract double getCommand(double curretnOutput);
+
+	/**
+	 * Set a new goal for the controller.
+	 *
+	 * @param newGoal
+	 *            the new goal for the controller
+	 */
+	public void setGoal(double newGoal) {
+		this.goal = newGoal;
 	}
 }

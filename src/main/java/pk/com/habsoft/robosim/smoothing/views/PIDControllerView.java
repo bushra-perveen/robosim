@@ -1,6 +1,5 @@
 package pk.com.habsoft.robosim.smoothing.views;
 
-
 import java.awt.Frame;
 
 import javax.swing.JDesktopPane;
@@ -8,7 +7,6 @@ import javax.swing.JFrame;
 
 import pk.com.habsoft.robosim.internal.RootView;
 import pk.com.habsoft.robosim.smoothing.LineChartPanel;
-
 
 public class PIDControllerView extends RootView {
 
@@ -19,7 +17,26 @@ public class PIDControllerView extends RootView {
 	static int PNL_CONTROL_WIDTH = 300;
 	static int PNL_CONTROL_HEIGHT = 250;
 
+	public static void main(String[] args) {
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		JDesktopPane desk = new JDesktopPane();
+		frame.setContentPane(desk);
+
+		PIDControllerView view1 = new PIDControllerView();
+
+		desk.add(view1);
+		view1.setVisible(true);
+		// Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+		// frame.setLocation((int) size.getWidth() - 600, (int) size.getHeight()
+		// - 800);
+		// frame.setSize(600, 700);
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frame.setVisible(true);
+	}
+
 	LineChartPanel pnlChart;
+
 	PIDControlPanel pnlControl;
 
 	public PIDControllerView() {
@@ -27,6 +44,17 @@ public class PIDControllerView extends RootView {
 		setLayout(null);
 		loadProperties();
 		initGUI();
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+	}
+
+	@Override
+	public void hide() {
+
+		super.hide();
 	}
 
 	@Override
@@ -66,35 +94,6 @@ public class PIDControllerView extends RootView {
 	public void saveProperties() {
 		pnlControl.saveProperties();
 		super.saveProperties();
-	}
-
-	@Override
-	public void dispose() {
-		super.dispose();
-	}
-
-	@Override
-	public void hide() {
-
-		super.hide();
-	}
-
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		JDesktopPane desk = new JDesktopPane();
-		frame.setContentPane(desk);
-
-		PIDControllerView view1 = new PIDControllerView();
-
-		desk.add(view1);
-		view1.setVisible(true);
-		// Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-		// frame.setLocation((int) size.getWidth() - 600, (int) size.getHeight()
-		// - 800);
-		// frame.setSize(600, 700);
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.setVisible(true);
 	}
 
 }

@@ -33,6 +33,33 @@ import pk.com.habsoft.robosim.planning.pathsmoother.views.PathSmoothingView;
 import pk.com.habsoft.robosim.smoothing.views.PIDControllerView;
 
 public class RoboSim extends JFrame implements ActionListener {
+	// This class adds a new JInternalFrame when requested.
+	class AddFrameAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		JInternalFrame frame = null;
+
+		public AddFrameAction(String name, JInternalFrame frame) {
+			super(name);
+			this.frame = frame;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			RootView view = (RootView) frame;
+			view.setVisible(true); // Needed since 1.3
+			try {
+				view.setSelected(true);
+				if (!view.isInit) {
+					view.initGUI();
+				}
+			} catch (PropertyVetoException e) {
+			}
+		}
+
+		// private Integer layer;
+		// private String name;
+	}
+
 	// Numbus, Napkin
 	final static String title = "RoboSim (Robot Simulator)";
 	// First version
@@ -52,11 +79,25 @@ public class RoboSim extends JFrame implements ActionListener {
 	// PIC controller
 	// final static String version = " 1.3.2 (2014-4-1)";
 	final static String version = "  1.4.0 (2014-11-1)";
+
 	private static final long serialVersionUID = 1L;
+
+	public static void main(String[] args) {
+
+		RoboSim robosim = new RoboSim(title + version);
+
+		Toolkit tool = Toolkit.getDefaultToolkit();
+		robosim.setSize(tool.getScreenSize());
+		robosim.setVisible(true);
+
+		// robosim.showContactDetail();
+
+	}
 
 	private JDesktopPane desk;
 
 	JMenuItem miExit;
+
 	JMenuItem miAbout;
 
 	public RoboSim(String title) {
@@ -92,6 +133,11 @@ public class RoboSim extends JFrame implements ActionListener {
 
 		addWindowListener(new WindowAdapter() {
 			@Override
+			public void windowClosed(WindowEvent e) {
+
+			}
+
+			@Override
 			public void windowClosing(WindowEvent e) {
 				if (e.getID() == WindowEvent.WINDOW_CLOSING) {
 					JInternalFrame frms[] = desk.getAllFrames();
@@ -107,12 +153,20 @@ public class RoboSim extends JFrame implements ActionListener {
 					}
 				}
 			}
+		});
+	}
 
-			@Override
-			public void windowClosed(WindowEvent e) {
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object obj = e.getSource();
+		if (obj instanceof JMenuItem) {
+			if (obj.equals(miExit)) {
+				System.exit(0);
+			} else if (obj.equals(miAbout)) {
+				showContactDetail();
 
 			}
-		});
+		}
 	}
 
 	// Create a menu bar to show off a few things.
@@ -200,67 +254,59 @@ public class RoboSim extends JFrame implements ActionListener {
 		desk.add(l, new Integer(Integer.MIN_VALUE));
 	}
 
-	// This class adds a new JInternalFrame when requested.
-	class AddFrameAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		JInternalFrame frame = null;
-
-		public AddFrameAction(String name, JInternalFrame frame) {
-			super(name);
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent ev) {
-			RootView view = (RootView) frame;
-			view.setVisible(true); // Needed since 1.3
-			try {
-				view.setSelected(true);
-				if (!view.isInit)
-					view.initGUI();
-			} catch (PropertyVetoException e) {
-			}
-		}
-
-		// private Integer layer;
-		// private String name;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object obj = e.getSource();
-		if (obj instanceof JMenuItem) {
-			if (obj.equals(miExit)) {
-				System.exit(0);
-			} else if (obj.equals(miAbout)) {
-				showContactDetail();
-
-			}
-		}
-	}
-
 	private void showContactDetail() {
 		// URL url = RoboSim.class.getResource("images/about.jpg");
 		Icon ico = new ImageIcon(getClass().getResource("/images/about.jpg"));
-		JOptionPane.showOptionDialog(null,
-				"                RoboSim(Robot Simulator)\nVersion = " + version
+		JOptionPane
+		.showOptionDialog(
+				null,
+				"                RoboSim(Robot Simulator)\nVersion = "
+						+ version
 						+ "\nIf you need any help regarding this software, I am just an email away.\nEmail = faisal.hameed.pk@gmail.com\nSkype = faisal.hameed.pk",
-				"About Me", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, ico, new Object[] {}, null);
-
-	}
-
-	public static void main(String[] args) {
-
-		RoboSim robosim = new RoboSim(title + version);
-
-		Toolkit tool = Toolkit.getDefaultToolkit();
-		robosim.setSize(tool.getScreenSize());
-		robosim.setVisible(true);
-
-		// robosim.showContactDetail();
+						"About Me", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, ico, new Object[] {}, null);
 
 	}
 }
+
+class SampleDesktopMgr extends DefaultDesktopManager {
+
+	private static final long serialVersionUID = 1L;
+
+	// This is called anytime a frame is moved. This
+	// implementation keeps the frame from leaving the desktop.
+	@Override
+	public void dragFrame(JComponent f, int x, int y) {
+		if (f instanceof JInternalFrame) { // Deal only w/internal frames
+			JInternalFrame frame = (JInternalFrame) f;
+			JDesktopPane desk = frame.getDesktopPane();
+			Dimension d = desk.getSize();
+
+			// Nothing all that fancy below, just figuring out how to adjust
+			// to keep the frame on the desktop.
+			if (x < 0) { // too far left?
+				x = 0; // flush against the left side
+			} else {
+				if (x + frame.getWidth() > d.width) { // too far right?
+					x = d.width - frame.getWidth(); // flush against right side
+				}
+			}
+			if (y < 0) { // too high?
+				y = 0; // flush against the top
+			} else {
+				if (y + frame.getHeight() > d.height) { // too low?
+					y = d.height - frame.getHeight(); // flush against the
+					// bottom
+				}
+			}
+		}
+
+		// Pass along the (possibly cropped) values to the normal drag handler.
+		super.dragFrame(f, x, y);
+	}
+}
+
+// SampleDesktopMgr.java
+// A DesktopManager that keeps its frames inside the desktop.
 
 class TileAction extends AbstractAction {
 	private static final long serialVersionUID = 1L;
@@ -277,8 +323,9 @@ class TileAction extends AbstractAction {
 		// How many frames do we have?
 		JInternalFrame[] allframes = desk.getAllFrames();
 		int count = allframes.length;
-		if (count == 0)
+		if (count == 0) {
 			return;
+		}
 
 		// Determine the necessary grid size
 		int sqrt = (int) Math.sqrt(count);
@@ -320,44 +367,4 @@ class TileAction extends AbstractAction {
 		}
 	}
 
-}
-
-// SampleDesktopMgr.java
-// A DesktopManager that keeps its frames inside the desktop.
-
-class SampleDesktopMgr extends DefaultDesktopManager {
-
-	private static final long serialVersionUID = 1L;
-
-	// This is called anytime a frame is moved. This
-	// implementation keeps the frame from leaving the desktop.
-	@Override
-	public void dragFrame(JComponent f, int x, int y) {
-		if (f instanceof JInternalFrame) { // Deal only w/internal frames
-			JInternalFrame frame = (JInternalFrame) f;
-			JDesktopPane desk = frame.getDesktopPane();
-			Dimension d = desk.getSize();
-
-			// Nothing all that fancy below, just figuring out how to adjust
-			// to keep the frame on the desktop.
-			if (x < 0) { // too far left?
-				x = 0; // flush against the left side
-			} else {
-				if (x + frame.getWidth() > d.width) { // too far right?
-					x = d.width - frame.getWidth(); // flush against right side
-				}
-			}
-			if (y < 0) { // too high?
-				y = 0; // flush against the top
-			} else {
-				if (y + frame.getHeight() > d.height) { // too low?
-					y = d.height - frame.getHeight(); // flush against the
-					// bottom
-				}
-			}
-		}
-
-		// Pass along the (possibly cropped) values to the normal drag handler.
-		super.dragFrame(f, x, y);
-	}
 }

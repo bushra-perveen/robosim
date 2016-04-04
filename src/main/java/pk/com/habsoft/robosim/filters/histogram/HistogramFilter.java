@@ -32,66 +32,34 @@ public class HistogramFilter {
 		reset();
 	}
 
-	public void setMotionNoise(double noise) {
-		this.pMove = 1 - noise;
-		this.pStay = noise;
-	}
-
-	public void setSensorNoise(double noise) {
-		this.pHit = 1 - noise;
-		this.pMiss = noise;
-	}
-
-	public void setCyclic(boolean cyclic) {
-		this.cyclic = cyclic;
-	}
-
-	public void setWorld(int[][] world) {
-		this.world = world;
-		reset();
-	}
-
-	public void reset() {
-		p = new double[world.length][world[0].length];
-
-		int length = world.length * world[0].length;
-
-		for (int y = 0; y < p.length; y++) {
-			for (int x = 0; x < p[y].length; x++) {
-				p[y][x] = 1.0 / length;
-			}
+	/**
+	 *
+	 * @param num
+	 * @param length
+	 * @return modulus (equivalent to python modulus)
+	 */
+	private int circle(int num, int length) {
+		int newNum = num % length;
+		if (newNum < 0) {
+			newNum += length;
 		}
+		return newNum;
 	}
 
-	public void sense(int z) {
-		double sum = 0;
-		for (int i = 0; i < world.length; i++) {
-			for (int j = 0; j < world[i].length; j++) {
-				if (world[i][j] == z)
-					p[i][j] *= pHit;
-				else
-					p[i][j] *= pMiss;
-				sum += p[i][j];
-			}
+	public String getP(int i, int j) {
+		double num = 0.00;
+		if (i >= 0 && i < p.length && j >= 0 && j < p[0].length) {
+			num = p[i][j];
 		}
-		// if the sensor contradicts then load intial belief
-		if (sum == 0) {
-			reset();
-		} else {
-			for (int y = 0; y < p.length; y++) {
-				for (int x = 0; x < p[y].length; x++) {
-					p[y][x] /= sum;
-				}
-			}
-		}
+		return df.format(num);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param action
 	 *            ActionIndex : (0:Up , 1:Left , 2:Down , 3,Right)
-	 * 
-	 * 
+	 *
+	 *
 	 *            This will update the Robot motion belief matrix.
 	 */
 	public void move(int action) {
@@ -121,27 +89,6 @@ public class HistogramFilter {
 
 	}
 
-	/**
-	 * 
-	 * @param num
-	 * @param length
-	 * @return modulus (equivalent to python modulus)
-	 */
-	private int circle(int num, int length) {
-		int newNum = num % length;
-		if (newNum < 0)
-			newNum += length;
-		return newNum;
-	}
-
-	public String getP(int i, int j) {
-		double num = 0.00;
-		if (i >= 0 && i < p.length && j >= 0 && j < p[0].length) {
-			num = p[i][j];
-		}
-		return df.format(num);
-	}
-
 	public void printP() {
 		printP(p);
 	}
@@ -156,5 +103,60 @@ public class HistogramFilter {
 		}
 		System.out.println("   sum " + df.format(sum));
 
+	}
+
+	public void reset() {
+		p = new double[world.length][world[0].length];
+
+		int length = world.length * world[0].length;
+
+		for (int y = 0; y < p.length; y++) {
+			for (int x = 0; x < p[y].length; x++) {
+				p[y][x] = 1.0 / length;
+			}
+		}
+	}
+
+	public void sense(int z) {
+		double sum = 0;
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[i].length; j++) {
+				if (world[i][j] == z) {
+					p[i][j] *= pHit;
+				} else {
+					p[i][j] *= pMiss;
+				}
+				sum += p[i][j];
+			}
+		}
+		// if the sensor contradicts then load intial belief
+		if (sum == 0) {
+			reset();
+		} else {
+			for (int y = 0; y < p.length; y++) {
+				for (int x = 0; x < p[y].length; x++) {
+					p[y][x] /= sum;
+				}
+			}
+		}
+	}
+
+	public void setCyclic(boolean cyclic) {
+		this.cyclic = cyclic;
+	}
+
+	public void setMotionNoise(double noise) {
+		this.pMove = 1 - noise;
+		this.pStay = noise;
+	}
+
+	public void setSensorNoise(double noise) {
+		this.pHit = 1 - noise;
+		this.pMiss = noise;
+	}
+
+	public void setWorld(int[][] world) {
+		this.world = world;
+		reset();
 	}
 }

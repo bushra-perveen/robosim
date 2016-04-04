@@ -1,6 +1,5 @@
 package pk.com.habsoft.robosim.filters.particles.views;
 
-
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -19,14 +18,8 @@ public class ParticleFilterView extends RootView {
 
 	private static final long serialVersionUID = 1L;
 
-	RPanel pnlOutput;
-	SimulationPanel pnlWorld;
-	ControlPanel pnlControls;
-	JTextArea ta;
-
 	final static int PNL_CONTROL_SIZE = 180;
 	final static double PNL_WORLD_RATIO = 0.6;
-
 	public static int PNL_WORLD_WIDTH;
 	public static int PNL_WORLD_HEIGHT;
 
@@ -36,6 +29,32 @@ public class ParticleFilterView extends RootView {
 	static int PNL_CONTROL_WIDTH;
 	static int PNL_CONTROL_HEIGHT;
 
+	public static void main(String[] args) {
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		JDesktopPane desk = new JDesktopPane();
+		frame.setContentPane(desk);
+
+		ParticleFilterView view1 = new ParticleFilterView();
+		view1.initGUI();
+
+		desk.add(view1);
+		view1.setVisible(true);
+		// Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+		// frame.setLocation((int) size.getWidth() - 600, (int) size.getHeight()
+		// - 800);
+		// frame.setSize(600, 700);
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		frame.setVisible(true);
+	}
+
+	RPanel pnlOutput;
+
+	SimulationPanel pnlWorld;
+	ControlPanel pnlControls;
+
+	JTextArea ta;
+
 	ParticleSimulator sim;
 
 	public ParticleFilterView() {
@@ -43,6 +62,22 @@ public class ParticleFilterView extends RootView {
 		setLayout(new GridLayout(2, 2));
 		setLayout(null);
 		loadProperties();
+	}
+
+	@Override
+	public void dispose() {
+		if (sim != null) {
+			sim.setRunning(false);
+		}
+		super.dispose();
+	}
+
+	@Override
+	public void hide() {
+		if (sim != null) {
+			sim.setRunning(false);
+		}
+		super.hide();
 	}
 
 	@Override
@@ -79,11 +114,6 @@ public class ParticleFilterView extends RootView {
 
 	}
 
-	public void showOutPut(String txt) {
-		ta.append(" " + txt + "\n");
-		ta.setCaretPosition(ta.getDocument().getLength());
-	}
-
 	@Override
 	public boolean loadProperties() {
 		System.out.println("Property File = " + propertyFile);
@@ -105,39 +135,9 @@ public class ParticleFilterView extends RootView {
 		super.saveProperties();
 	}
 
-	@Override
-	public void dispose() {
-		if (sim != null) {
-			sim.setRunning(false);
-		}
-		super.dispose();
-	}
-
-	@Override
-	public void hide() {
-		if (sim != null) {
-			sim.setRunning(false);
-		}
-		super.hide();
-	}
-
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		JDesktopPane desk = new JDesktopPane();
-		frame.setContentPane(desk);
-
-		ParticleFilterView view1 = new ParticleFilterView();
-		view1.initGUI();
-
-		desk.add(view1);
-		view1.setVisible(true);
-		// Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-		// frame.setLocation((int) size.getWidth() - 600, (int) size.getHeight()
-		// - 800);
-		// frame.setSize(600, 700);
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.setVisible(true);
+	public void showOutPut(String txt) {
+		ta.append(" " + txt + "\n");
+		ta.setCaretPosition(ta.getDocument().getLength());
 	}
 
 }

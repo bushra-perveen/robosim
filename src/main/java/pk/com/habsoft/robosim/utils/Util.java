@@ -7,8 +7,22 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class Util {
 	public static DecimalFormat df = new DecimalFormat("####0.##########");
 
-	public static void printMatrix(RealMatrix m) {
-		printArrayP(m.getData());
+	public static double findMax(double[] arr) {
+		double max = arr[0];
+		for (int i = 0; i < arr.length; i++) {
+			if (max < arr[i]) {
+				max = arr[i];
+			}
+		}
+		return max;
+	}
+
+	public static String padLeft(String s, int n) {
+		return String.format("%1$#" + n + "s", s);
+	}
+
+	public static String padRight(String s, int n) {
+		return String.format("%1$-" + n + "s", s);
 	}
 
 	public static void printArrayP(double[][] p) {
@@ -43,22 +57,8 @@ public class Util {
 
 	}
 
-	public static double findMax(double[] arr) {
-		double max = arr[0];
-		for (int i = 0; i < arr.length; i++) {
-			if (max < arr[i]) {
-				max = arr[i];
-			}
-		}
-		return max;
-	}
-
-	public static String padRight(String s, int n) {
-		return String.format("%1$-" + n + "s", s);
-	}
-
-	public static String padLeft(String s, int n) {
-		return String.format("%1$#" + n + "s", s);
+	public static void printMatrix(RealMatrix m) {
+		printArrayP(m.getData());
 	}
 
 	public boolean isValidValue(double value, double min, double max) {

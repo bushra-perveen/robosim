@@ -10,6 +10,24 @@ public class WorldNode implements Comparable<WorldNode> {
 
 	private static int instances = 0;
 
+	public static int getInstances() {
+		return instances;
+	}
+
+	public static void main(String[] args) {
+		PriorityQueue<WorldNode> q = new PriorityQueue<WorldNode>();
+		for (int i = 0; i < 5; i++) {
+			WorldNode s = new WorldNode(i, i);
+			s.setHeuristic(5 - i);
+			s.setDepth(i * 2);
+			q.add(s);
+			System.out.println("Adding " + s);
+		}
+		while (!q.isEmpty()) {
+			System.out.println("Poll " + q.poll());
+		}
+	}
+
 	/**
 	 * x,y location of this node in the worlds
 	 */
@@ -18,7 +36,9 @@ public class WorldNode implements Comparable<WorldNode> {
 	 * Heuristic value to be used for algorithm.
 	 */
 	private double heuristic = 0;
+
 	private int depth = 0;
+
 	// private int cost = 0;
 	/**
 	 * By following which action this node is populated. To trace back the path.
@@ -38,58 +58,19 @@ public class WorldNode implements Comparable<WorldNode> {
 		setAction(node.getAction());
 	}
 
-	public static int getInstances() {
-		return instances;
-	}
-
-	public int getxLoc() {
-		return xLoc;
-	}
-
-	public void setxLoc(int xLoc) {
-		this.xLoc = xLoc;
-	}
-
-	public int getyLoc() {
-		return yLoc;
-	}
-
-	public void setyLoc(int yLoc) {
-		this.yLoc = yLoc;
-	}
-
-	public double getHeuristic() {
-		return heuristic;
-	}
-
-	public void setHeuristic(double heuristic) {
-		this.heuristic = heuristic;
-	}
-
-	public int getDepth() {
-		return depth;
-	}
-
-	public void setDepth(int depth) {
-		this.depth = depth;
-	}
-
-	public double getCost() {
-		return this.depth + this.heuristic;
-	}
-
-	public int getAction() {
-		return action;
-	}
-
-	public void setAction(int action) {
-		this.action = action;
-	}
-
 	@Override
-	public String toString() {
-		return "WorldState [xLoc=" + xLoc + ", yLoc=" + yLoc + ", heuristic=" + heuristic + ", depth=" + depth
-				+ ", Cost=" + getCost() + ", action=" + action + "]";
+	public int compareTo(WorldNode that) {
+		int returnValue = 0;
+		// f = g + h
+
+		if (this.getCost() == that.getCost()) {
+			returnValue = 0;
+		} else if (this.getCost() < that.getCost()) {
+			returnValue = -1;
+		} else {
+			returnValue = 1;
+		}
+		return returnValue;
 	}
 
 	@Override
@@ -98,31 +79,53 @@ public class WorldNode implements Comparable<WorldNode> {
 		return (this.xLoc == that.xLoc && this.yLoc == that.yLoc);
 	}
 
-	@Override
-	public int compareTo(WorldNode that) {
-		int returnValue = 0;
-		// f = g + h
-
-		if (this.getCost() == that.getCost())
-			returnValue = 0;
-		else if (this.getCost() < that.getCost())
-			returnValue = -1;
-		else
-			returnValue = 1;
-		return returnValue;
+	public int getAction() {
+		return action;
 	}
 
-	public static void main(String[] args) {
-		PriorityQueue<WorldNode> q = new PriorityQueue<WorldNode>();
-		for (int i = 0; i < 5; i++) {
-			WorldNode s = new WorldNode(i, i);
-			s.setHeuristic(5 - i);
-			s.setDepth(i * 2);
-			q.add(s);
-			System.out.println("Adding " + s);
-		}
-		while (!q.isEmpty()) {
-			System.out.println("Poll " + q.poll());
-		}
+	public double getCost() {
+		return this.depth + this.heuristic;
+	}
+
+	public int getDepth() {
+		return depth;
+	}
+
+	public double getHeuristic() {
+		return heuristic;
+	}
+
+	public int getxLoc() {
+		return xLoc;
+	}
+
+	public int getyLoc() {
+		return yLoc;
+	}
+
+	public void setAction(int action) {
+		this.action = action;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
+	}
+
+	public void setHeuristic(double heuristic) {
+		this.heuristic = heuristic;
+	}
+
+	public void setxLoc(int xLoc) {
+		this.xLoc = xLoc;
+	}
+
+	public void setyLoc(int yLoc) {
+		this.yLoc = yLoc;
+	}
+
+	@Override
+	public String toString() {
+		return "WorldState [xLoc=" + xLoc + ", yLoc=" + yLoc + ", heuristic=" + heuristic + ", depth=" + depth + ", Cost=" + getCost()
+				+ ", action=" + action + "]";
 	}
 }

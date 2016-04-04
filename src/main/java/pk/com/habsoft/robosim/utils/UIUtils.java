@@ -16,25 +16,6 @@ public class UIUtils {
 
 	public static Font labelFont = new Font("Comic", Font.BOLD, 16);
 
-	public static JPanel createSpinnerPanel(String text, JSpinner spn, int value, int min, int max, int step) {
-		JPanel pnl = new JPanel();
-		pnl.setLayout(new GridLayout(1, 2));
-		pnl.add(new JLabel(" " + text + " "));
-		spn.setModel(new SpinnerNumberModel(value, min, max, step));
-		pnl.add(spn);
-		return pnl;
-	}
-
-	public static JPanel createSpinnerPanel(String text, JSpinner spn, double value, double min, double max,
-			double step) {
-		JPanel pnl = new JPanel();
-		pnl.setLayout(new GridLayout(1, 2));
-		pnl.add(new JLabel(" " + text + " "));
-		spn.setModel(new SpinnerNumberModel(value, min, max, step));
-		pnl.add(spn);
-		return pnl;
-	}
-
 	public static JLabel createLabel(int width, int height, String text) {
 		JLabel header = new JLabel();
 		// header.setSize(width, height);
@@ -48,5 +29,23 @@ public class UIUtils {
 		header.setText(text);
 		return header;
 
+	}
+
+	public static JPanel createSpinnerPanel(String text, JSpinner spn, double value, double min, double max, double step) {
+		JPanel pnl = new JPanel();
+		pnl.setLayout(new GridLayout(1, 2));
+		pnl.add(new JLabel(" " + text + " "));
+		spn.setModel(new SpinnerNumberModel(value, min, max, step));
+		pnl.add(spn);
+		return pnl;
+	}
+
+	public static JPanel createSpinnerPanel(String text, JSpinner spn, int value, int min, int max, int step) {
+		JPanel pnl = new JPanel();
+		pnl.setLayout(new GridLayout(1, 2));
+		pnl.add(new JLabel(" " + text + " "));
+		spn.setModel(new SpinnerNumberModel(value, min, max, step));
+		pnl.add(spn);
+		return pnl;
 	}
 }

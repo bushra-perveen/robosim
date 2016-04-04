@@ -28,8 +28,8 @@ public class GradientDescent {
 
 	}
 
-	public static List<PathNode> smooth(List<PathNode> pathList, double weight_data, double weight_smooth,
-			double tolerance, int timeout, boolean smoothBoundries) {
+	public static List<PathNode> smooth(List<PathNode> pathList, double weight_data, double weight_smooth, double tolerance, int timeout,
+			boolean smoothBoundries) {
 		double[][] path = new double[pathList.size()][2];
 		double[][] newpath = new double[pathList.size()][2];
 		for (int i = 0; i < pathList.size(); i++) {
@@ -58,8 +58,9 @@ public class GradientDescent {
 					double alpha_value = weight_data * ((path[i][j]) - newpath[i][j]);
 					double beeta_value = 0;
 					if (smoothBoundries) {
-						if (i < newpath.length - 1)
+						if (i < newpath.length - 1) {
 							beeta_value = weight_smooth * (newpath[i + 1][j] - newpath[i][j]);
+						}
 					} else {
 						beeta_value = weight_smooth * (newpath[i - 1][j] + newpath[i + 1][j] - (2.0 * newpath[i][j]));
 					}

@@ -4,34 +4,6 @@ import pk.com.habsoft.robosim.utils.Util;
 
 public class KalmanFilterGaussian {
 
-	/**
-	 * 
-	 * @param mean1
-	 * @param var1
-	 * @param mean2
-	 * @param var2
-	 * @return measurement update
-	 */
-	public static Mu_Sigma update(double mean1, double var1, double mean2, double var2) {
-		double new_mean = (mean1 * var2 + mean2 * var1) / (var1 + var2);
-		double new_var = 1 / (1 / var1 + 1 / var2);
-		return new Mu_Sigma(new_mean, new_var);
-	}
-
-	/**
-	 * 
-	 * @param mean1
-	 * @param var1
-	 * @param mean2
-	 * @param var2
-	 * @return Motion/Prediction Update(Correction)
-	 */
-	public static Mu_Sigma predict(double mean1, double var1, double mean2, double var2) {
-		double new_mean = mean1 + mean2;
-		double new_var = var1 + var2;
-		return new Mu_Sigma(new_mean, new_var);
-	}
-
 	public static void main(String[] args) {
 
 		double[] measurements = { 5.0, 6.0, 7.0, 9.0, 10.0 };
@@ -52,6 +24,34 @@ public class KalmanFilterGaussian {
 			System.out.println("Predict " + newVal);
 		}
 
+	}
+
+	/**
+	 *
+	 * @param mean1
+	 * @param var1
+	 * @param mean2
+	 * @param var2
+	 * @return Motion/Prediction Update(Correction)
+	 */
+	public static Mu_Sigma predict(double mean1, double var1, double mean2, double var2) {
+		double new_mean = mean1 + mean2;
+		double new_var = var1 + var2;
+		return new Mu_Sigma(new_mean, new_var);
+	}
+
+	/**
+	 *
+	 * @param mean1
+	 * @param var1
+	 * @param mean2
+	 * @param var2
+	 * @return measurement update
+	 */
+	public static Mu_Sigma update(double mean1, double var1, double mean2, double var2) {
+		double new_mean = (mean1 * var2 + mean2 * var1) / (var1 + var2);
+		double new_var = 1 / (1 / var1 + 1 / var2);
+		return new Mu_Sigma(new_mean, new_var);
 	}
 }
 

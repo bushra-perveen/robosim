@@ -54,22 +54,6 @@ public class SmoothingControlPanel extends RPanel implements ActionListener, Pro
 	JSpinner spWeightData, spWeightSmooth, spCellDivisions, spSmoothingTimeout;
 	JButton btnApply;
 
-	public void setDrawingPanel(DrawingPanel observer) {
-
-		this.drawingPanel = observer;
-		this.drawingPanel.setShowActualPath(showActualPath);
-		this.drawingPanel.setShowSmoothPath(showSmoothPath);
-		this.drawingPanel.setShowGrid(showGrid);
-		this.drawingPanel.setSmoothBoundryPoints(smoothBoundryPoints);
-		this.drawingPanel.setWeightData(weightData);
-		this.drawingPanel.setWeightSmooth(weightSmooth);
-		this.drawingPanel.setCellDivisions(cellDivisions);
-		this.drawingPanel.setSmotthingTimeout(smoothingTimeout);
-		drawingPanel.smooth();
-		this.drawingPanel.repaint();
-
-	}
-
 	public SmoothingControlPanel(Properties props, int width, int height, String label) {
 		super(width, height, label);
 		this.props = props;
@@ -102,20 +86,48 @@ public class SmoothingControlPanel extends RPanel implements ActionListener, Pro
 		pnl.add(UIUtils.createSpinnerPanel(" Cell Division", spCellDivisions, cellDivisions, 0, 50, 1));
 
 		spSmoothingTimeout = new JSpinner();
-		pnl.add(UIUtils.createSpinnerPanel(" Smoothing Timeout", spSmoothingTimeout, smoothingTimeout, 0,
-				Integer.MAX_VALUE, 1));
+		pnl.add(UIUtils.createSpinnerPanel(" Smoothing Timeout", spSmoothingTimeout, smoothingTimeout, 0, Integer.MAX_VALUE, 1));
 
 		spWeightData = new JSpinner();
 		pnl.add(UIUtils.createSpinnerPanel(" Weight Data( " + ALPHA + " )", spWeightData, weightData, 0, 1, 0.01));
 
 		spWeightSmooth = new JSpinner();
-		pnl.add(UIUtils.createSpinnerPanel(" Weight Smooth( " + BEETA + " )", spWeightSmooth, weightSmooth, 0, 1,
-				0.01));
+		pnl.add(UIUtils.createSpinnerPanel(" Weight Smooth( " + BEETA + " )", spWeightSmooth, weightSmooth, 0, 1, 0.01));
 
 		pnl.add(btnApply = new JButton("Apply Setting"));
 		btnApply.addActionListener(this);
 
 		add(pnl, BorderLayout.NORTH);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object obj = e.getSource();
+
+		if (obj.equals(cbShowGrid)) {
+			showGrid = cbShowGrid.isSelected();
+			drawingPanel.setShowGrid(showGrid);
+		} else if (obj.equals(cbShowActualPath)) {
+			showActualPath = cbShowActualPath.isSelected();
+			drawingPanel.setShowActualPath(showActualPath);
+		} else if (obj.equals(cbShowSmoothPath)) {
+			showSmoothPath = cbShowSmoothPath.isSelected();
+			drawingPanel.setShowSmoothPath(showSmoothPath);
+		} else if (obj.equals(btnApply)) {
+			cellDivisions = Integer.parseInt(spCellDivisions.getValue().toString());
+			smoothingTimeout = Integer.parseInt(spSmoothingTimeout.getValue().toString());
+			weightData = Double.parseDouble(spWeightData.getValue().toString());
+			weightSmooth = Double.parseDouble(spWeightSmooth.getValue().toString());
+			this.drawingPanel.setWeightData(weightData);
+			this.drawingPanel.setWeightSmooth(weightSmooth);
+			this.drawingPanel.setCellDivisions(cellDivisions);
+			this.drawingPanel.setSmotthingTimeout(smoothingTimeout);
+			drawingPanel.smooth();
+		} else if (obj.equals(cbSmoothBoundryPoints)) {
+			smoothBoundryPoints = cbSmoothBoundryPoints.isSelected();
+			this.drawingPanel.setSmoothBoundryPoints(smoothBoundryPoints);
+		}
+		this.drawingPanel.repaint();
 	}
 
 	@Override
@@ -167,34 +179,20 @@ public class SmoothingControlPanel extends RPanel implements ActionListener, Pro
 		}
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object obj = e.getSource();
+	public void setDrawingPanel(DrawingPanel observer) {
 
-		if (obj.equals(cbShowGrid)) {
-			showGrid = cbShowGrid.isSelected();
-			drawingPanel.setShowGrid(showGrid);
-		} else if (obj.equals(cbShowActualPath)) {
-			showActualPath = cbShowActualPath.isSelected();
-			drawingPanel.setShowActualPath(showActualPath);
-		} else if (obj.equals(cbShowSmoothPath)) {
-			showSmoothPath = cbShowSmoothPath.isSelected();
-			drawingPanel.setShowSmoothPath(showSmoothPath);
-		} else if (obj.equals(btnApply)) {
-			cellDivisions = Integer.parseInt(spCellDivisions.getValue().toString());
-			smoothingTimeout = Integer.parseInt(spSmoothingTimeout.getValue().toString());
-			weightData = Double.parseDouble(spWeightData.getValue().toString());
-			weightSmooth = Double.parseDouble(spWeightSmooth.getValue().toString());
-			this.drawingPanel.setWeightData(weightData);
-			this.drawingPanel.setWeightSmooth(weightSmooth);
-			this.drawingPanel.setCellDivisions(cellDivisions);
-			this.drawingPanel.setSmotthingTimeout(smoothingTimeout);
-			drawingPanel.smooth();
-		} else if (obj.equals(cbSmoothBoundryPoints)) {
-			smoothBoundryPoints = cbSmoothBoundryPoints.isSelected();
-			this.drawingPanel.setSmoothBoundryPoints(smoothBoundryPoints);
-		}
+		this.drawingPanel = observer;
+		this.drawingPanel.setShowActualPath(showActualPath);
+		this.drawingPanel.setShowSmoothPath(showSmoothPath);
+		this.drawingPanel.setShowGrid(showGrid);
+		this.drawingPanel.setSmoothBoundryPoints(smoothBoundryPoints);
+		this.drawingPanel.setWeightData(weightData);
+		this.drawingPanel.setWeightSmooth(weightSmooth);
+		this.drawingPanel.setCellDivisions(cellDivisions);
+		this.drawingPanel.setSmotthingTimeout(smoothingTimeout);
+		drawingPanel.smooth();
 		this.drawingPanel.repaint();
+
 	}
 
 }

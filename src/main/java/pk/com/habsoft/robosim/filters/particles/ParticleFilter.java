@@ -14,32 +14,6 @@ public class ParticleFilter {
 	public ParticleFilter() {
 	}
 
-	public void setNoise(double sense_noise, double steering_noise, double forward_noise) {
-		this.sense_noise = sense_noise;
-		this.steering_noise = steering_noise;
-		this.forward_noise = forward_noise;
-	}
-
-	public double[] get_average_position(IRobot[] p) {
-		double x_sum = 0.0;
-		double y_sum = 0.0;
-		double or_sum = 0.0;
-		for (int j = 0; j < p.length; j++) {
-			x_sum += p[j].getX();
-			y_sum += p[j].getY();
-			// System.out.println(p.get(j));
-			// orientation is tricky because it is cyclic. By normalizing
-			// around the first particle we are somewhat more robust to
-			// the 0=2pi problem
-			or_sum += (RoboMathUtils.modulus((p[j].getOrientation() - p[0].getOrientation() + Math.PI), (2.0 * Math.PI))
-					+ p[0].getOrientation() - Math.PI);
-		}
-		if (p != null && p.length > 0)
-			return new double[] { x_sum / p.length, y_sum / p.length, or_sum / p.length };
-		else
-			return new double[] { x_sum, y_sum, or_sum };
-	}
-
 	public double eval(IRobot myrobot, IRobot[] p) {
 		double sum = 0.0;
 		for (int i = 0; i < p.length; i++) {
@@ -53,8 +27,8 @@ public class ParticleFilter {
 		return sum / p.length;
 	}
 
-	public double filter(IRobot myrobot, IRobot[] p, IRobot ghost, double[][] motions, int particles,
-			double newParticlesRatio, double unSampledRatio) {
+	public double filter(IRobot myrobot, IRobot[] p, IRobot ghost, double[][] motions, int particles, double newParticlesRatio,
+			double unSampledRatio) {
 
 		// To solve the robot kidnaped problem
 		// this will randomly generate new particles
@@ -123,6 +97,27 @@ public class ParticleFilter {
 		return error;
 	}
 
+	public double[] get_average_position(IRobot[] p) {
+		double x_sum = 0.0;
+		double y_sum = 0.0;
+		double or_sum = 0.0;
+		for (int j = 0; j < p.length; j++) {
+			x_sum += p[j].getX();
+			y_sum += p[j].getY();
+			// System.out.println(p.get(j));
+			// orientation is tricky because it is cyclic. By normalizing
+			// around the first particle we are somewhat more robust to
+			// the 0=2pi problem
+			or_sum += (RoboMathUtils.modulus((p[j].getOrientation() - p[0].getOrientation() + Math.PI), (2.0 * Math.PI))
+					+ p[0].getOrientation() - Math.PI);
+		}
+		if (p != null && p.length > 0) {
+			return new double[] { x_sum / p.length, y_sum / p.length, or_sum / p.length };
+		} else {
+			return new double[] { x_sum, y_sum, or_sum };
+		}
+	}
+
 	public void reSample(double[] w, IRobot[] src, IRobot[] dest) {
 		double beta = 0;
 		double mw = Util.findMax(w);
@@ -136,6 +131,12 @@ public class ParticleFilter {
 			}
 			dest[i] = src[index];
 		}
+	}
+
+	public void setNoise(double sense_noise, double steering_noise, double forward_noise) {
+		this.sense_noise = sense_noise;
+		this.steering_noise = steering_noise;
+		this.forward_noise = forward_noise;
 	}
 
 	// public void reSample(double[] w, IRobot[] src, IRobot[] dest) {

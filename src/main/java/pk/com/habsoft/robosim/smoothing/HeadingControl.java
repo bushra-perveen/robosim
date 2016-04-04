@@ -29,25 +29,10 @@ import pk.com.habsoft.robosim.smoothing.controller.PIDController;
 /**
  * Heading control interface for Position, Position2D and Position3D Player
  * interfaces. Uses methods from both player interfaces and PIDController.
- * 
+ *
  * @author Radu Bogdan Rusu & Marius Borodi
  */
 public class HeadingControl extends PIDController {
-
-	private IRobot device;
-
-	/* PID coefficients */
-	private int Kp = 1;
-	private int Ki = 0;
-	private int Kd = 0;
-
-	private boolean stop = false;
-
-	/* minimum and maximum admissible commands */
-	private double minCommand = 1;
-	private double maxCommand = 45;
-	/* maximum allowed error */
-	private double maxError = 0;
 
 	public static void main(String[] args) {
 		// myrobot = robot()
@@ -96,9 +81,24 @@ public class HeadingControl extends PIDController {
 
 	}
 
+	private IRobot device;
+	/* PID coefficients */
+	private int Kp = 1;
+	private int Ki = 0;
+
+	private int Kd = 0;
+
+	private boolean stop = false;
+	/* minimum and maximum admissible commands */
+	private double minCommand = 1;
+	private double maxCommand = 45;
+
+	/* maximum allowed error */
+	private double maxError = 0;
+
 	/**
 	 * Constructor for HeadingControl.
-	 * 
+	 *
 	 * @param pd
 	 *            a reference to a PlayerDevice interface (Position, Position2D
 	 *            or Position3D).
@@ -110,7 +110,25 @@ public class HeadingControl extends PIDController {
 
 	/**
 	 * Constructor for HeadingControl.
-	 * 
+	 *
+	 * @param pd
+	 *            a reference to a PlayerDevice interface (Position, Position2D
+	 *            or Position3D).
+	 * @param minC
+	 *            minimum admissible command for the robot's motors
+	 * @param maxC
+	 *            maximum admissible command for the robot's motors
+	 */
+	public HeadingControl(IRobot pd, int minC, int maxC) {
+		super(1, 0, 0);
+		this.minCommand = minC;
+		this.maxCommand = maxC;
+		this.device = pd;
+	}
+
+	/**
+	 * Constructor for HeadingControl.
+	 *
 	 * @param pd
 	 *            a reference to a PlayerDevice interface (Position, Position2D
 	 *            or Position3D).
@@ -131,25 +149,7 @@ public class HeadingControl extends PIDController {
 
 	/**
 	 * Constructor for HeadingControl.
-	 * 
-	 * @param pd
-	 *            a reference to a PlayerDevice interface (Position, Position2D
-	 *            or Position3D).
-	 * @param minC
-	 *            minimum admissible command for the robot's motors
-	 * @param maxC
-	 *            maximum admissible command for the robot's motors
-	 */
-	public HeadingControl(IRobot pd, int minC, int maxC) {
-		super(1, 0, 0);
-		this.minCommand = minC;
-		this.maxCommand = maxC;
-		this.device = pd;
-	}
-
-	/**
-	 * Constructor for HeadingControl.
-	 * 
+	 *
 	 * @param pd
 	 *            a reference to a PlayerDevice interface (Position, Position2D
 	 *            or Position3D).
@@ -175,60 +175,53 @@ public class HeadingControl extends PIDController {
 	}
 
 	/**
-	 * Set the minimum admissible command for the robot's motors.
-	 * 
-	 * @param minC
-	 *            minimum admissible command as an integer
+	 * Bound the output command to the minimum and maximum admissible commands.
+	 *
+	 * @param command
+	 *            command to bound
+	 * @return new bounded command
 	 */
-	public void setMinimumCommand(double minC) {
-		this.minCommand = minC;
-	}
-
-	/**
-	 * Set the maximum admissible command for the robot's motors.
-	 * 
-	 * @param maxC
-	 *            maximum admissible command as an integer
-	 */
-	public void setMaximumCommand(double maxC) {
-		this.maxCommand = maxC;
-	}
-
-	/**
-	 * Stop the robot from moving.
-	 */
-	public void stopRobot() {
-		this.stop = true;
-	}
-
-	/**
-	 * Set the maximum allowed error between the final goal and the current
-	 * position. (default error is 0)
-	 * 
-	 * @param err
-	 *            maximum allowed error as an integer
-	 */
-	public void setAllowedError(double err) {
-		this.maxError = err;
+	private double boundCommand(double command) {
+		if (command == 0) {
+			return 0;
+		}
+		if (command < 0) {
+			if (command > -minCommand) {
+				command = -minCommand;
+			}
+			if (command < -maxCommand) {
+				command = -maxCommand;
+			}
+		} else {
+			if (command < minCommand) {
+				command = minCommand;
+			}
+			if (command > maxCommand) {
+				command = maxCommand;
+			}
+		}
+		return command;
 	}
 
 	/**
 	 * Calculate and return the controller's command for the controlled system.
-	 * 
+	 *
 	 * @param currentOutput
 	 *            the current output of the system
 	 * @return the new calculated command for the system
 	 */
+	@Override
 	public double getCommand(double currentOutput) {
 		this.currE = this.goal - currentOutput;
 
 		/* Angle adjustments */
-		if (currE <= -180)
+		if (currE <= -180) {
 			currE = 360 + currE;
-		else if (currE >= 180 && currE <= 360)
+		} else if (currE >= 180 && currE <= 360) {
 			currE = currE - 360;
-		else if (currE > 360)
+		} else if (currE > 360) {
 			currE = currE - 360;
+		}
 
 		eSum += currE;
 
@@ -242,64 +235,38 @@ public class HeadingControl extends PIDController {
 	}
 
 	/**
-	 * Bound the output command to the minimum and maximum admissible commands.
-	 * 
-	 * @param command
-	 *            command to bound
-	 * @return new bounded command
+	 * Set the maximum allowed error between the final goal and the current
+	 * position. (default error is 0)
+	 *
+	 * @param err
+	 *            maximum allowed error as an integer
 	 */
-	private double boundCommand(double command) {
-		if (command == 0)
-			return 0;
-		if (command < 0) {
-			if (command > -minCommand)
-				command = -minCommand;
-			if (command < -maxCommand)
-				command = -maxCommand;
-		} else {
-			if (command < minCommand)
-				command = minCommand;
-			if (command > maxCommand)
-				command = maxCommand;
-		}
-		return command;
-	}
-
-	/**
-	 * Angle transformations, used internally.
-	 * 
-	 * @param angle
-	 *            angle to transform
-	 * @return new transformed angle
-	 */
-	private double transformAngle(double angle) {
-		angle = angle % 360;
-		if (angle < 0)
-			angle = 360 + angle;
-		return angle;
+	public void setAllowedError(double err) {
+		this.maxError = err;
 	}
 
 	/**
 	 * Rotate the robot on spot (differential heading) with a desired heading.
-	 * 
+	 *
 	 * @param angle
 	 *            angle for rotation
 	 * @return false in case the rotation was interrupted, true otherwise
 	 */
 	public boolean setDiffHeading(double angle) {
-		if (angle == 0)
+		if (angle == 0) {
 			return true;
+		}
 
 		stop = false;
 		boolean ret = true;
 		/* get the current heading */
-		double currentHead = transformAngle((double) device.getOrientation());
+		double currentHead = transformAngle(device.getOrientation());
 		/* calculate the goal heading */
 		double newGoal = transformAngle(currentHead + angle);
 
 		setGoal(newGoal);
 
-		double now = transformAngle((double) device.getOrientation());
+		double now = transformAngle(device.getOrientation());
 
 		/* keep rotating while the goal was not reached */
 		while (now != newGoal) {
@@ -309,18 +276,20 @@ public class HeadingControl extends PIDController {
 			}
 
 			/* no point in rotating at all if we're at +/-180 */
-			if (Math.abs(now - newGoal) <= 1 && newGoal == 180)
+			if (Math.abs(now - newGoal) <= 1 && newGoal == 180) {
 				break; /* exit if we reached our destination */
+			}
 
 			/*
 			 * in case a diff. of maxError (default 0) between angles is
 			 * acceptable
 			 */
-			if (Math.abs(now - newGoal) <= maxError)
+			if (Math.abs(now - newGoal) <= maxError) {
 				break; /* exit if we reached our destination */
+			}
 
 			/* get the current heading */
-			now = transformAngle((double) device.getOrientation());
+			now = transformAngle(device.getOrientation());
 
 			/* get the motor command and check if within the desired limits */
 			double command = getCommand(now);
@@ -339,26 +308,69 @@ public class HeadingControl extends PIDController {
 
 	/**
 	 * Rotate the robot on spot (absolute heading) to the desired heading.
-	 * 
+	 *
 	 * @param angle
 	 *            goal angle
 	 * @return false in case the rotation was interrupted, true otherwise
 	 */
 	public boolean setHeading(double angle) {
 		/* get the current heading */
-		double currentAngle = transformAngle((double) device.getOrientation());
+		double currentAngle = transformAngle(device.getOrientation());
 
 		/* difference between the current heading and the goal heading */
 		double deltaAngle = (angle - currentAngle);
 
 		if (deltaAngle != 0) {
-			if (deltaAngle <= 180 && deltaAngle > 0)
+			if (deltaAngle <= 180 && deltaAngle > 0) {
 				return setDiffHeading(deltaAngle);
-			else if (deltaAngle > -180)
+			} else if (deltaAngle > -180) {
 				return setDiffHeading(-360 + deltaAngle);
-			else
+			} else {
 				return setDiffHeading(360 + deltaAngle);
+			}
 		}
 		return true;
+	}
+
+	/**
+	 * Set the maximum admissible command for the robot's motors.
+	 *
+	 * @param maxC
+	 *            maximum admissible command as an integer
+	 */
+	public void setMaximumCommand(double maxC) {
+		this.maxCommand = maxC;
+	}
+
+	/**
+	 * Set the minimum admissible command for the robot's motors.
+	 *
+	 * @param minC
+	 *            minimum admissible command as an integer
+	 */
+	public void setMinimumCommand(double minC) {
+		this.minCommand = minC;
+	}
+
+	/**
+	 * Stop the robot from moving.
+	 */
+	public void stopRobot() {
+		this.stop = true;
+	}
+
+	/**
+	 * Angle transformations, used internally.
+	 *
+	 * @param angle
+	 *            angle to transform
+	 * @return new transformed angle
+	 */
+	private double transformAngle(double angle) {
+		angle = angle % 360;
+		if (angle < 0) {
+			angle = 360 + angle;
+		}
+		return angle;
 	}
 }

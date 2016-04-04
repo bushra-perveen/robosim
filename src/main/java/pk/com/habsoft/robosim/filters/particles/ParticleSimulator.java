@@ -10,6 +10,7 @@ import pk.com.habsoft.robosim.filters.particles.views.ParticleFilterView;
 import pk.com.habsoft.robosim.filters.particles.views.SimulationPanel;
 
 public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
+	public static boolean runa = true;
 	private IRobot robot;
 	private IRobot ghost;
 	// private World world;
@@ -26,11 +27,12 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 	double newParticleRatio = 0;
 	double unSampledRatio = 0;
 	int landMarkSize = 0;
-	boolean showGhost = false;
 
+	boolean showGhost = false;
 	ParticleFilter filter = new ParticleFilter();
 	private SimulationPanel gui;
 	private ParticleFilterView output;
+
 	private List<SimulationObject> objects;
 
 	public ParticleSimulator() {
@@ -38,9 +40,41 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 		new World();
 	}
 
-	public void reset(int particles, double distanceNoise, double steeringNoise, double forwardNoise, int robotSize,
-			int ghostSize, int particleSize, double[][] motions, double newParticles, double unSampled,
-			int landMarkSize) {
+	public synchronized boolean isRunning() {
+		return run;
+	}
+
+	@Override
+	public Iterator<SimulationObject> iterator() {
+		return objects.iterator();
+	}
+
+	public void kidnapRobot() {
+		robot.random();
+		paint();
+		output.showOutPut("-----------------------");
+		output.showOutPut("OOppsssssssss Someone Kidnaped Me");
+		output.showOutPut("" + robot);
+		output.showOutPut("-----------------------");
+	}
+
+	public void nextStep() {
+		this.count = 1;
+		start();
+	}
+
+	/**
+	 * This will draw new objects on Canvas
+	 */
+	public void paint() {
+		if (output != null) {
+			gui.canvas.invalidate();
+			gui.canvas.repaint();
+		}
+	}
+
+	public void reset(int particles, double distanceNoise, double steeringNoise, double forwardNoise, int robotSize, int ghostSize,
+			int particleSize, double[][] motions, double newParticles, double unSampled, int landMarkSize) {
 		this.paricles = particles;
 		particleList = new IRobot[paricles];
 		this.sense_noise = distanceNoise;
@@ -57,7 +91,7 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 		// objects.add(world);
 		World.LANDMARK_SIZE = landMarkSize;
 		for (int i = 0; i < World.getLandmark().size(); i++) {
-			objects.add((SimulationObject) World.getLandmark().get(i));
+			objects.add(World.getLandmark().get(i));
 		}
 
 		// IRobot temp = new Robot(particleSize);
@@ -65,7 +99,7 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 		// add particles
 		for (int i = 0; i < paricles; i++) {
 			try {
-				IRobot r = (IRobot) temp.clone();
+				IRobot r = temp.clone();
 				r.setNoise(sense_noise, steering_noise, forward_noise);
 				r.random();
 				objects.add(r);
@@ -76,7 +110,7 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 		}
 
 		IRobot car = new Robot(robotSize, RobotType.ROBOT);
-		objects.add((SimulationObject) car);
+		objects.add(car);
 		this.robot = car;
 
 		IRobot gh = new Robot(ghostSize, RobotType.GHOST);
@@ -84,62 +118,6 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 		this.ghost = gh;
 		showGhost(this.showGhost);
 
-	}
-
-	public void setMotions(double[][] motions, double newParticles, double unSampledRatio) {
-		this.motions = motions;
-		this.newParticleRatio = newParticles;
-		this.unSampledRatio = unSampledRatio;
-	}
-
-	public void setLaserRange(boolean boundedVision, int laserRange, int laserAngle) {
-		for (Iterator<SimulationObject> iter = objects.iterator(); iter.hasNext();) {
-			SimulationObject obj = iter.next();
-			if (obj instanceof IRobot) {
-				IRobot temp = (IRobot) obj;
-				temp.setBoundedVision(boundedVision);
-				temp.setLaserRange(laserRange);
-				temp.setLaserAngle(laserAngle);
-			}
-		}
-		paint();
-	}
-
-	public void showGhost(boolean show) {
-		if (show)
-			objects.add(ghost);
-		else
-			objects.remove(ghost);
-		paint();
-
-	}
-
-	private boolean start() {
-		if (currentThread == null) {
-			currentThread = new Thread(this);
-			currentThread.start();
-			return true;
-		}
-		return false;
-	}
-
-	public void simulate() {
-		this.count = Integer.MAX_VALUE;
-		start();
-	}
-
-	public void nextStep() {
-		this.count = 1;
-		start();
-	}
-
-	public void kidnapRobot() {
-		robot.random();
-		paint();
-		output.showOutPut("-----------------------");
-		output.showOutPut("OOppsssssssss Someone Kidnaped Me");
-		output.showOutPut("" + robot);
-		output.showOutPut("-----------------------");
 	}
 
 	@Override
@@ -153,8 +131,7 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 			// for (SimulationObject o : objects)
 			// o.update(0.02f);
 
-			double error = filter.filter(robot, particleList, ghost, motions, particleList.length, newParticleRatio,
-					unSampledRatio);
+			double error = filter.filter(robot, particleList, ghost, motions, particleList.length, newParticleRatio, unSampledRatio);
 			output.showOutPut("Iteration = " + i);
 			output.showOutPut("" + robot);
 			output.showOutPut("" + ghost);
@@ -179,41 +156,63 @@ public class ParticleSimulator implements Runnable, Iterable<SimulationObject> {
 		currentThread = null;
 	}
 
-	@Override
-	public Iterator<SimulationObject> iterator() {
-		return objects.iterator();
-	}
-
-	public static boolean runa = true;
-
-	/**
-	 * This will draw new objects on Canvas
-	 */
-	public void paint() {
-		if (output != null) {
-			gui.canvas.invalidate();
-			gui.canvas.repaint();
+	public void setLaserRange(boolean boundedVision, int laserRange, int laserAngle) {
+		for (Iterator<SimulationObject> iter = objects.iterator(); iter.hasNext();) {
+			SimulationObject obj = iter.next();
+			if (obj instanceof IRobot) {
+				IRobot temp = (IRobot) obj;
+				temp.setBoundedVision(boundedVision);
+				temp.setLaserRange(laserRange);
+				temp.setLaserAngle(laserAngle);
+			}
 		}
+		paint();
 	}
 
-	public synchronized void setRunning(boolean b) {
-		run = b;
-	}
-
-	public synchronized boolean isRunning() {
-		return run;
-	}
-
-	public void setSimulationPanel(SimulationPanel p) {
-		gui = p;
+	public void setMotions(double[][] motions, double newParticles, double unSampledRatio) {
+		this.motions = motions;
+		this.newParticleRatio = newParticles;
+		this.unSampledRatio = unSampledRatio;
 	}
 
 	public void setOutPutPanel(ParticleFilterView p) {
 		output = p;
 	}
 
+	public synchronized void setRunning(boolean b) {
+		run = b;
+	}
+
+	public void setSimulationPanel(SimulationPanel p) {
+		gui = p;
+	}
+
 	public void setTimeDelay(int i) {
 		timeDelay = i;
+	}
+
+	public void showGhost(boolean show) {
+		if (show) {
+			objects.add(ghost);
+		} else {
+			objects.remove(ghost);
+		}
+		paint();
+
+	}
+
+	public void simulate() {
+		this.count = Integer.MAX_VALUE;
+		start();
+	}
+
+	private boolean start() {
+		if (currentThread == null) {
+			currentThread = new Thread(this);
+			currentThread.start();
+			return true;
+		}
+		return false;
 	}
 
 }

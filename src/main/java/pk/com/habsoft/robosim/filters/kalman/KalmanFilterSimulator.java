@@ -6,36 +6,43 @@ import pk.com.habsoft.robosim.utils.RoboMathUtils;
 
 public class KalmanFilterSimulator {
 
+	public static DecimalFormat df = new DecimalFormat("####0.000");
+
+	public static void main(String[] args) {
+		KalmanFilterSimulator anim = new KalmanFilterSimulator(10, 0, 0.5);
+		anim.simulate();
+		System.out.println(anim.filter.getX());
+	}
+
 	// simulation parameters
 	int total_time;
 	double measurement_variance;
-
 	// #Data Arrays for plotting
 	double[] position_measurements;
+
 	double[] car_positions;
 	double[] position_kalman;
-
 	double[] veloc_measurement;
+
 	double[] car_veloc;
 	double[] veloc_kalman;
-
 	double[] measurement_error;
 	double[] kalman_position_error;
+
 	double[] measurement_verror;
 	double[] kalman_veloc_error;
-
 	double[][] xx = { { 0 }, { 0 } };
 	double[][] pp = { { 1000.0, 0.0 }, { 0.0, 1000.0 } };
 	double[][] uu = { { 0.0 }, { 0.0 } };
 	double[][] ff = { { 1.0, 1.0 }, { 0.0, 1.0 } };
+
 	double[][] hh = { { 1.0, 0.0 } };
+
 	double[][] rr = { { 1.0 } };
 
 	double carSpeed = 0.5;
 
 	KalmanFilter filter = new KalmanFilter(xx, pp, uu, ff, hh, rr);
-
-	public static DecimalFormat df = new DecimalFormat("####0.000");
 
 	public KalmanFilterSimulator(int total_time, double variance, double carSpeed) {
 		this.total_time = total_time;
@@ -61,6 +68,46 @@ public class KalmanFilterSimulator {
 	// #our car drives with constant speed
 	public double carPos(double t) {
 		return carSpeed * t;
+	}
+
+	public double[] getCarPositions() {
+		return this.car_positions;
+	}
+
+	public double[] getCarVelocities() {
+		return this.car_veloc;
+	}
+
+	public double[] getPositionKalmanError() {
+		return this.kalman_position_error;
+	}
+
+	public double[] getPositionMeasurementError() {
+		return this.measurement_error;
+	}
+
+	public double[] getPositionMeasurements() {
+		return this.position_measurements;
+	}
+
+	public double[] getPositionsKalman() {
+		return this.position_kalman;
+	}
+
+	public double[] getVelocitiesKalman() {
+		return this.veloc_kalman;
+	}
+
+	public double[] getVelocityKalmanError() {
+		return this.kalman_veloc_error;
+	}
+
+	public double[] getVelocityMeasurementError() {
+		return this.measurement_verror;
+	}
+
+	public double[] getVelocityMeasurements() {
+		return this.veloc_measurement;
 	}
 
 	public void simulate() {
@@ -109,52 +156,6 @@ public class KalmanFilterSimulator {
 
 		}
 
-	}
-
-	public static void main(String[] args) {
-		KalmanFilterSimulator anim = new KalmanFilterSimulator(10, 0, 0.5);
-		anim.simulate();
-		System.out.println(anim.filter.getX());
-	}
-
-	public double[] getPositionMeasurements() {
-		return this.position_measurements;
-	}
-
-	public double[] getCarPositions() {
-		return this.car_positions;
-	}
-
-	public double[] getPositionsKalman() {
-		return this.position_kalman;
-	}
-
-	public double[] getVelocityMeasurements() {
-		return this.veloc_measurement;
-	}
-
-	public double[] getCarVelocities() {
-		return this.car_veloc;
-	}
-
-	public double[] getVelocitiesKalman() {
-		return this.veloc_kalman;
-	}
-
-	public double[] getPositionKalmanError() {
-		return this.kalman_position_error;
-	}
-
-	public double[] getPositionMeasurementError() {
-		return this.measurement_error;
-	}
-
-	public double[] getVelocityKalmanError() {
-		return this.kalman_veloc_error;
-	}
-
-	public double[] getVelocityMeasurementError() {
-		return this.measurement_verror;
 	}
 
 }

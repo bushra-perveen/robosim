@@ -36,28 +36,6 @@ public class StatisticsPanel extends RPanel implements AlgorithmListener {
 		add(pnl, BorderLayout.NORTH);
 	}
 
-	private void createOutputPanelContents(JPanel pnlOutput) {
-
-		pnlOutput.setLayout(new GridLayout(4, 2, 5, 3));
-
-		pnlOutput.add(new JLabel(strExplored));
-		pnlOutput.add(lblExplored = new JLabel());
-		pnlOutput.add(new JLabel(strBlocked));
-		pnlOutput.add(lblBlocked = new JLabel());
-		pnlOutput.add(new JLabel(strUnExplored));
-		pnlOutput.add(lblUnExplored = new JLabel());
-		pnlOutput.add(new JLabel(strTotal));
-		pnlOutput.add(lblTotal = new JLabel());
-		pnlOutput.add(new JLabel(strPathSize));
-		pnlOutput.add(lblPathSize = new JLabel());
-		pnlOutput.add(new JLabel(strInstances));
-		pnlOutput.add(lblInstances = new JLabel());
-		pnlOutput.add(new JLabel(strResult));
-		pnlOutput.add(lblResult = new JLabel());
-		lblResult.setForeground(Color.RED);
-
-	}
-
 	@Override
 	public void algorithmUpdate(Algorithm algorithm) {
 		if (algorithm != null) {
@@ -77,6 +55,28 @@ public class StatisticsPanel extends RPanel implements AlgorithmListener {
 			lblResult.setText("NA");
 			lblTotal.setText("0");
 		}
+
+	}
+
+	private void createOutputPanelContents(JPanel pnlOutput) {
+
+		pnlOutput.setLayout(new GridLayout(4, 2, 5, 3));
+
+		pnlOutput.add(new JLabel(strExplored));
+		pnlOutput.add(lblExplored = new JLabel());
+		pnlOutput.add(new JLabel(strBlocked));
+		pnlOutput.add(lblBlocked = new JLabel());
+		pnlOutput.add(new JLabel(strUnExplored));
+		pnlOutput.add(lblUnExplored = new JLabel());
+		pnlOutput.add(new JLabel(strTotal));
+		pnlOutput.add(lblTotal = new JLabel());
+		pnlOutput.add(new JLabel(strPathSize));
+		pnlOutput.add(lblPathSize = new JLabel());
+		pnlOutput.add(new JLabel(strInstances));
+		pnlOutput.add(lblInstances = new JLabel());
+		pnlOutput.add(new JLabel(strResult));
+		pnlOutput.add(lblResult = new JLabel());
+		lblResult.setForeground(Color.RED);
 
 	}
 

@@ -1,6 +1,5 @@
 package pk.com.habsoft.robosim.smoothing.views;
 
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Label;
@@ -19,7 +18,6 @@ import pk.com.habsoft.robosim.internal.RPanel;
 import pk.com.habsoft.robosim.smoothing.LineChartPanel;
 import pk.com.habsoft.robosim.utils.UIUtils;
 
-
 public class PIDControlPanel extends JPanel implements PropertiesListener, ActionListener {
 
 	private static final long serialVersionUID = 1L;
@@ -29,36 +27,28 @@ public class PIDControlPanel extends JPanel implements PropertiesListener, Actio
 	final static String TAU_I = "TAU_I";
 	final static String ITERATIONS = "ITERATIONS";
 	final static String SPEED = "SPEED";
-	final static String SHOWREF = "SHOWREF", SHOWP = "SHOWP", SHOWPDRIFT = "SHOWPDRIFT", SHOWD = "SHOWD", SHOWDDRIFT = "SHOWDDRIFT", SHOWI = "SHOWI", SHOWIDRIFT = "SHOWIDRIFT", SHOWPD = "SHOWPD",
-			SHOWPDDRIFT = "SHOWPDDRIFT", SHOWPI = "SHOWPI", SHOWPIDRIFT = "SHOWPIDRIFT", SHOWPID = "SHOWPID", SHOWPIDDRIFT = "SHOWPIDDRIFT";
-
-	LineChartPanel chart;
-	PIDSimulator simulator;
-
-	JSpinner spProportional, spDifferenctial, spIntegral;
-	JSpinner spSteeringDrift, spIterations, spSpeed;
-	JButton btnSetting;
-
-	Properties props;
-	JCheckBox cbRef, cbP, cbPDrift, cbD, cbDDrift, cbI, cbIDrift, cbPD, cbPDDrift, cbPI, cbPIDrift, cbPID, cbPIDDrift;
-	boolean showRef = true, showP = true, showPDrift, showD, showDDrift, showI, showIDrift, showPD, showPDDrift, showPI, showPIDrift, showPID, showPIDDrift;
+	final static String SHOWREF = "SHOWREF", SHOWP = "SHOWP", SHOWPDRIFT = "SHOWPDRIFT", SHOWD = "SHOWD", SHOWDDRIFT = "SHOWDDRIFT",
+			SHOWI = "SHOWI", SHOWIDRIFT = "SHOWIDRIFT", SHOWPD = "SHOWPD", SHOWPDDRIFT = "SHOWPDDRIFT", SHOWPI = "SHOWPI",
+			SHOWPIDRIFT = "SHOWPIDRIFT", SHOWPID = "SHOWPID", SHOWPIDDRIFT = "SHOWPIDDRIFT";
 
 	// Simulator Variables
 	private static char degree = '\u00B0';
+	LineChartPanel chart;
+
+	PIDSimulator simulator;
+	JSpinner spProportional, spDifferenctial, spIntegral;
+	JSpinner spSteeringDrift, spIterations, spSpeed;
+
+	JButton btnSetting;
+	Properties props;
+	JCheckBox cbRef, cbP, cbPDrift, cbD, cbDDrift, cbI, cbIDrift, cbPD, cbPDDrift, cbPI, cbPIDrift, cbPID, cbPIDDrift;
+
+	boolean showRef = true, showP = true, showPDrift, showD, showDDrift, showI, showIDrift, showPD, showPDDrift, showPI, showPIDrift,
+			showPID, showPIDDrift;
 	double tauP = 0.2, tauD = 3.0, tauI = 0.004;
 	int drift = 10;// in degrees
 	int iterations = 100;
 	int speed = 1;
-
-	public PIDControlPanel(Properties props, int width, int height, LineChartPanel chart) {
-		this.props = props;
-		this.chart = chart;
-		setLayout(new GridLayout(3, 1));
-		setSize(width, height);
-
-		loadProperties();
-		initGUI();
-	}
 
 	private ActionListener displayListener = new ActionListener() {
 
@@ -82,6 +72,38 @@ public class PIDControlPanel extends JPanel implements PropertiesListener, Actio
 			updateChartData();
 		}
 	};
+
+	public PIDControlPanel(Properties props, int width, int height, LineChartPanel chart) {
+		this.props = props;
+		this.chart = chart;
+		setLayout(new GridLayout(3, 1));
+		setSize(width, height);
+
+		loadProperties();
+		initGUI();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		tauP = Double.parseDouble(spProportional.getValue().toString());
+		tauD = Double.parseDouble(spDifferenctial.getValue().toString());
+		tauI = Double.parseDouble(spIntegral.getValue().toString());
+
+		drift = Integer.parseInt(spSteeringDrift.getValue().toString());
+		iterations = Integer.parseInt(spIterations.getValue().toString());
+		speed = Integer.parseInt(spSpeed.getValue().toString());
+
+		// simulator = new PIDSimulator();
+		simulator.setTauP(tauP);
+		simulator.setTauD(tauD);
+		simulator.setTauI(tauI);
+		simulator.setSteerDrift(drift);
+		simulator.setIter(iterations);
+		simulator.setSpeed(speed);
+
+		updateChartData();
+	}
 
 	private void initGUI() {
 
@@ -180,8 +202,10 @@ public class PIDControlPanel extends JPanel implements PropertiesListener, Actio
 		area.setEditable(false);
 		area.setText("A robotic car is at point (0,1) and want to travell along x-axis. The steering of this car is based on P.I.D controller and it will turns the car towards x-axis based on different values of P.I.D controller."
 				+ " The graph will show the results of (P.I.D) controller with the given parameters.");
-		area.setText("A robotic car is at point (0,1) and want to travell along x-axis.\n" + " The steering of this car is based on P.I.D controller and it will \n "
-				+ "turns the car towards x-axis based on different values of \nP.I.D controller." + " The graph will show the results of \n(P.I.D) controller with the given parameters.");
+		area.setText("A robotic car is at point (0,1) and want to travell along x-axis.\n"
+				+ " The steering of this car is based on P.I.D controller and it will \n "
+				+ "turns the car towards x-axis based on different values of \nP.I.D controller."
+				+ " The graph will show the results of \n(P.I.D) controller with the given parameters.");
 		pnlScenario.add(area, BorderLayout.CENTER);
 
 		add(pnlController);
@@ -253,48 +277,35 @@ public class PIDControlPanel extends JPanel implements PropertiesListener, Actio
 		props.setProperty(SHOWPIDDRIFT, Boolean.toString(showPIDDrift));
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-
-		tauP = Double.parseDouble(spProportional.getValue().toString());
-		tauD = Double.parseDouble(spDifferenctial.getValue().toString());
-		tauI = Double.parseDouble(spIntegral.getValue().toString());
-
-		drift = Integer.parseInt(spSteeringDrift.getValue().toString());
-		iterations = Integer.parseInt(spIterations.getValue().toString());
-		speed = Integer.parseInt(spSpeed.getValue().toString());
-
-		// simulator = new PIDSimulator();
-		simulator.setTauP(tauP);
-		simulator.setTauD(tauD);
-		simulator.setTauI(tauI);
-		simulator.setSteerDrift(drift);
-		simulator.setIter(iterations);
-		simulator.setSpeed(speed);
-
-		updateChartData();
-	}
-
 	private void updateChartData() {
 		chart.clearData();
-		if (showRef)
+		if (showRef) {
 			chart.addData("Reference", simulator.getRefData());
-		if (showP)
+		}
+		if (showP) {
 			chart.addData("P-Controller", simulator.getPData(false));
-		if (showPDrift)
+		}
+		if (showPDrift) {
 			chart.addData("P-Controller(Drift)", simulator.getPData(true));
-		if (showPD)
+		}
+		if (showPD) {
 			chart.addData("PD-Controller", simulator.getPDData(false));
-		if (showPDDrift)
+		}
+		if (showPDDrift) {
 			chart.addData("PD-Controller(Drift)", simulator.getPDData(true));
-		if (showPI)
+		}
+		if (showPI) {
 			chart.addData("PI-Controller", simulator.getPIData(false));
-		if (showPIDrift)
+		}
+		if (showPIDrift) {
 			chart.addData("PI-Controller(Drift)", simulator.getPIData(true));
-		if (showPID)
+		}
+		if (showPID) {
 			chart.addData("PID-Controller", simulator.getPIDData(false));
-		if (showPIDDrift)
+		}
+		if (showPIDDrift) {
 			chart.addData("PID-Controller(Drift)", simulator.getPIDData(true));
+		}
 	}
 
 }
